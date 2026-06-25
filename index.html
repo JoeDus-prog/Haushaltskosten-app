@@ -1,29 +1,37 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="de">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2685.5">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; -webkit-text-stroke: #000000}
-    span.s1 {font-kerning: none}
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Haushaltskosten-App</title>
+  <link rel="stylesheet" href="src/styles.css">
 </head>
 <body>
-<p class="p1"><span class="s1"> &lt;!DOCTYPE html&gt;</span></p>
-<p class="p1"><span class="s1">&lt;html&gt;</span></p>
-<p class="p1"><span class="s1">&lt;head&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;title&gt;Haushaltskosten-App&lt;/title&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/head&gt;</span></p>
-<p class="p1"><span class="s1">&lt;body&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;h1&gt;Wer hat was gezahlt?&lt;/h1&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;ul&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;li&gt;Max: 50€ (Einkaufen)&lt;/li&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;li&gt;Anna: 30€ (Strom)&lt;/li&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/ul&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/body&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/html&gt;</span></p>
+  <div class="container">
+    <h1>Wer hat was gezahlt?</h1>
+    
+    <form id="costForm" class="cost-form">
+      <div class="form-group">
+        <input type="text" id="person" placeholder="Name" required>
+      </div>
+      <div class="form-group">
+        <input type="number" id="amount" placeholder="Betrag (€)" step="0.01" required>
+      </div>
+      <div class="form-group">
+        <input type="text" id="reason" placeholder="Grund (z. B. Einkaufen)">
+      </div>
+      <button type="submit" class="btn">Hinzufügen</button>
+    </form>
+
+    <div class="summary" id="summary">
+      <p>Gesamt: <span id="totalAmount">0€</span></p>
+    </div>
+
+    <ul id="costList" class="cost-list">
+      <!-- Kosten werden dynamisch eingefügt -->
+    </ul>
+  </div>
+
+  <script src="src/app.js"></script>
 </body>
 </html>
