@@ -3,34 +3,98 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Einfache Web-App zur Verwaltung von Haushaltskosten für einen schnellen Überblick über Ausgaben">
+  <meta name="author" content="JoeDus-prog">
+  <meta name="keywords" content="Haushalt, Kosten, Budget, Finanzen, Verwaltung">
+  
+  <!-- Open Graph / Social Media -->
+  <meta property="og:title" content="Haushaltskosten-App">
+  <meta property="og:description" content="Verwalte deine Haushaltskosten einfach und übersichtlich">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://joedus-prog.github.io/Haushaltskosten-app/">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💰</text></svg>">
+  
   <title>Haushaltskosten-App</title>
   <link rel="stylesheet" href="src/styles.css">
 </head>
 <body>
   <div class="container">
-    <h1>Wer hat was gezahlt?</h1>
-    
-    <form id="costForm" class="cost-form">
+    <header>
+      <h1>Wer hat was gezahlt?</h1>
+      <p class="subtitle">Einfache Verwaltung von Haushaltskosten</p>
+    </header>
+
+    <!-- Such- und Filter-Controls werden dynamisch eingefügt -->
+
+    <form id="costForm" class="cost-form" aria-labelledby="form-heading">
+      <h2 id="form-heading" class="visually-hidden">Kosten hinzufügen</h2>
+      
       <div class="form-group">
-        <input type="text" id="person" placeholder="Name" required>
+        <label for="person">Name *</label>
+        <input 
+          type="text" 
+          id="person" 
+          placeholder="z. B. Max oder Anna" 
+          required 
+          aria-required="true"
+          autocomplete="name"
+        >
       </div>
+      
       <div class="form-group">
-        <input type="number" id="amount" placeholder="Betrag (€)" step="0.01" required>
+        <label for="amount">Betrag (€) *</label>
+        <input 
+          type="number" 
+          id="amount" 
+          placeholder="z. B. 50.00" 
+          step="0.01" 
+          min="0.01" 
+          required 
+          aria-required="true"
+          autocomplete="off"
+        >
       </div>
+      
       <div class="form-group">
-        <input type="text" id="reason" placeholder="Grund (z. B. Einkaufen)">
+        <label for="reason">Grund</label>
+        <input 
+          type="text" 
+          id="reason" 
+          placeholder="z. B. Einkaufen, Strom, Miete" 
+          autocomplete="off"
+        >
       </div>
-      <button type="submit" class="btn">Hinzufügen</button>
+      
+      <button type="submit" class="btn">
+        <span>Hinzufügen</span>
+      </button>
     </form>
 
-    <div class="summary" id="summary">
+    <div class="summary" id="summary" aria-live="polite">
       <p>Gesamt: <span id="totalAmount">0€</span></p>
     </div>
 
-    <ul id="costList" class="cost-list">
+    <div class="actions">
+      <button id="exportBtn" class="btn btn-secondary" aria-label="Kosten als CSV exportieren">
+        <span>📥 Exportieren</span>
+      </button>
+      <button id="importBtn" class="btn btn-secondary" aria-label="Kosten aus CSV importieren">
+        <span>📤 Importieren</span>
+      </button>
+      <button id="clearBtn" class="btn btn-danger" aria-label="Alle Kosten löschen">
+        <span>🗑️ Alle löschen</span>
+      </button>
+    </div>
+
+    <h2 class="visually-hidden">Kostenliste</h2>
+    <ul id="costList" class="cost-list" aria-live="polite" role="list">
       <!-- Kosten werden dynamisch eingefügt -->
     </ul>
   </div>
+
+  <!-- Toast Container wird dynamisch eingefügt -->
 
   <script src="src/app.js"></script>
 </body>

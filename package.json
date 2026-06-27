@@ -1,0 +1,26 @@
+{
+  "name": "haushaltskosten-app",
+  "version": "1.1.0",
+  "description": "Einfache Web-App zur Verwaltung von Haushaltskosten",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve .",
+    "dev": "npx live-server --port=3000",
+    "lint": "npx eslint src/**/*.js",
+    "format": "npx prettier --write .",
+    "test": "node tests/test.js"
+  },
+  "keywords": ["haushalt", "kosten", "budget", "finanzen", "verwalten"],
+  "author": "JoeDus-prog",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JoeDus-prog/Haushaltskosten-app.git"
+  },
+  "devDependencies": {
+    "eslint": "^8.56.0",
+    "live-server": "^1.2.2",
+    "prettier": "^3.2.5",
+    "serve": "^14.2.1"
+  }
+}

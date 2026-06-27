@@ -14,7 +14,7 @@ Thumbs.db
 *.swo
 *~
 
-# Node.js (falls später genutzt)
+# Node.js
 node_modules/
 package-lock.json
 npm-debug.log*
@@ -31,3 +31,32 @@ npm-debug.log*
 .env
 .env.local
 .env.*.local
+
+# Local Storage (für Entwicklung)
+localStorage.json
+
+# Test files
+coverage/
+.nyc_output/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Backup files
+*.bak
+*.backup
+
+# Editor files
+*.sublime-workspace
+*.sublime-project
+
+# OS specific
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Cache
+.cache/
+.eslintcache

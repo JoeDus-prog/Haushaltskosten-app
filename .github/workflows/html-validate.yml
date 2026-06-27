@@ -1,0 +1,37 @@
+name: HTML/CSS/JS Validation
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Validate HTML
+      uses: CybercentreCanada/assemblyline-v4-action/html-validate@v1
+      with:
+        path: 'index.html'
+        
+    - name: Lint CSS
+      run: |
+        npm install -g stylelint stylelint-config-standard
+        stylelint src/styles.css
+        
+    - name: Lint JavaScript
+      run: |
+        npm install -g eslint eslint-config-airbnb-base
+        npx eslint src/app.js --config .eslintrc.json
