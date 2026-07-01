@@ -1,5 +1,43 @@
 /* Haushaltskosten-App Styles */
 
+:root {
+  /* Light Mode Colors */
+  --primary-color: #3498db;
+  --primary-hover: #2980b9;
+  --secondary-color: #2c3e50;
+  --danger-color: #e74c3c;
+  --danger-hover: #c0392b;
+  --success-color: #2ecc71;
+  --light-bg: #f5f7fa;
+  --container-bg: #ffffff;
+  --text-primary: #333;
+  --text-secondary: #7f8c8d;
+  --border-color: #ddd;
+  --form-bg: #f8f9fa;
+  --summary-bg: #e8f4fc;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-hover: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Dark Mode Colors */
+[data-theme="dark"] {
+  --primary-color: #4a90e2;
+  --primary-hover: #357ab8;
+  --secondary-color: #e0e0e0;
+  --danger-color: #e74c3c;
+  --danger-hover: #c0392b;
+  --success-color: #2ecc71;
+  --light-bg: #1a1a1a;
+  --container-bg: #2a2a2a;
+  --text-primary: #f0f0f0;
+  --text-secondary: #a0a0a0;
+  --border-color: #444;
+  --form-bg: #333;
+  --summary-bg: #2a3a4a;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-hover: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -9,25 +47,50 @@
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.6;
-  color: #333;
-  background-color: #f5f7fa;
+  color: var(--text-primary);
+  background-color: var(--light-bg);
   padding: 20px;
+  transition: background-color 0.3s, color 0.3s;
 }
 
 .container {
   max-width: 800px;
   margin: 0 auto;
-  background: white;
+  background: var(--container-bg);
   padding: 30px;
   border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow);
 }
 
 h1 {
   text-align: center;
-  color: #2c3e50;
+  color: var(--secondary-color);
   margin-bottom: 30px;
   font-size: 2em;
+}
+
+/* Theme Toggle Button */
+.theme-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  transition: background-color 0.3s;
+}
+
+.theme-toggle:hover {
+  background: var(--primary-hover);
 }
 
 /* Form Styles */
@@ -36,7 +99,7 @@ h1 {
   flex-direction: column;
   gap: 15px;
   margin-bottom: 30px;
-  background: #f8f9fa;
+  background: var(--form-bg);
   padding: 20px;
   border-radius: 8px;
 }
@@ -49,24 +112,26 @@ h1 {
 
 .form-group input {
   padding: 12px;
-  border: 2px solid #ddd;
+  border: 2px solid var(--border-color);
   border-radius: 6px;
   font-size: 16px;
   transition: border-color 0.3s;
+  background-color: var(--container-bg);
+  color: var(--text-primary);
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: #3498db;
+  border-color: var(--primary-color);
 }
 
 .form-group input::placeholder {
-  color: #999;
+  color: var(--text-secondary);
 }
 
 .btn {
   padding: 12px 20px;
-  background-color: #3498db;
+  background-color: var(--primary-color);
   color: white;
   border: none;
   border-radius: 6px;
@@ -77,7 +142,7 @@ h1 {
 }
 
 .btn:hover {
-  background-color: #2980b9;
+  background-color: var(--primary-hover);
 }
 
 /* Summary Styles */
@@ -85,7 +150,7 @@ h1 {
   text-align: center;
   margin: 20px 0;
   padding: 15px;
-  background: #e8f4fc;
+  background: var(--summary-bg);
   border-radius: 8px;
   font-size: 1.2em;
 }
@@ -96,7 +161,7 @@ h1 {
 
 #totalAmount {
   font-weight: bold;
-  color: #2c3e50;
+  color: var(--secondary-color);
   font-size: 1.3em;
 }
 
@@ -110,18 +175,18 @@ h1 {
 
 .cost-list li {
   padding: 15px;
-  background: white;
-  border: 1px solid #ddd;
+  background: var(--container-bg);
+  border: 1px solid var(--border-color);
   border-radius: 6px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s;
 }
 
 .cost-list li:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-hover);
 }
 
 .cost-info {
@@ -130,21 +195,21 @@ h1 {
 
 .cost-person {
   font-weight: bold;
-  color: #2c3e50;
+  color: var(--secondary-color);
 }
 
 .cost-amount {
-  color: #e74c3c;
+  color: var(--danger-color);
   font-weight: bold;
 }
 
 .cost-reason {
-  color: #7f8c8d;
+  color: var(--text-secondary);
   font-size: 0.9em;
 }
 
 .delete-btn {
-  background: #e74c3c;
+  background: var(--danger-color);
   color: white;
   border: none;
   border-radius: 4px;
@@ -155,7 +220,7 @@ h1 {
 }
 
 .delete-btn:hover {
-  background: #c0392b;
+  background: var(--danger-hover);
 }
 
 /* Responsive Design */
@@ -180,5 +245,40 @@ h1 {
 
   .delete-btn {
     align-self: flex-end;
+  }
+
+  .theme-toggle {
+    top: 10px;
+    right: 10px;
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+}
+
+/* Focus Styles for Accessibility */
+.btn:focus,
+.delete-btn:focus,
+.form-group input:focus,
+.theme-toggle:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* Print Styles */
+@media print {
+  .theme-toggle,
+  .btn {
+    display: none;
+  }
+  
+  body {
+    background: white;
+    color: black;
+  }
+  
+  .container {
+    box-shadow: none;
+    border: 1px solid #ccc;
   }
 }
