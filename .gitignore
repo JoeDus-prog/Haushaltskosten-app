@@ -14,7 +14,7 @@ Thumbs.db
 *.swo
 *~
 
-# Node.js (falls später genutzt)
+# Node.js
 node_modules/
 package-lock.json
 npm-debug.log*
@@ -31,3 +31,7 @@ npm-debug.log*
 .env
 .env.local
 .env.*.local
+
+# Lint cache
+.eslintcache
+.stylelintcache
