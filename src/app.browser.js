@@ -1,12 +1,111 @@
 /**
- * Haushaltskosten-App
+ * Haushaltskosten-App - Browser Version (ohne ES Modules)
  * Verwaltung von Haushaltskosten mit localStorage
  * 
  * @module app
  */
 
-import { loadCosts, saveCosts } from './storage.js';
-import { calculateTotal, formatCurrency, escapeHtml, createCostElement } from './utils.js';
+// ============================================
+// STORAGE FUNCTIONS
+// ============================================
+
+/**
+ * Lädt Kosten aus localStorage
+ * @returns {Array<Object>} Array von Kosteneinträgen
+ */
+function loadCosts() {
+  try {
+    const savedCosts = localStorage.getItem('haushaltskosten');
+    return savedCosts ? JSON.parse(savedCosts) : [];
+  } catch (error) {
+    console.error('Fehler beim Laden der Kosten:', error);
+    return [];
+  }
+}
+
+/**
+ * Speichert Kosten in localStorage
+ * @param {Array<Object>} costs - Array von Kosteneinträgen
+ */
+function saveCosts(costs) {
+  try {
+    // Validierung: Nur gültige Einträge speichern
+    const validCosts = costs.filter(cost => 
+      cost && cost.person && cost.amount !== undefined
+    );
+    localStorage.setItem('haushaltskosten', JSON.stringify(validCosts));
+  } catch (error) {
+    console.error('Fehler beim Speichern der Kosten:', error);
+    // Fallback: Leeres Array speichern
+    localStorage.setItem('haushaltskosten', JSON.stringify([]));
+  }
+}
+
+// ============================================
+// UTILITY FUNCTIONS
+// ============================================
+
+/**
+ * Berechnet den Gesamtbetrag aller Kosten
+ * @param {Array<Object>} costs - Array von Kosteneinträgen
+ * @returns {number} Gesamtbetrag
+ */
+function calculateTotal(costs) {
+  return costs.reduce((total, cost) => {
+    const amount = parseFloat(cost.amount);
+    return total + (isNaN(amount) ? 0 : amount);
+  }, 0);
+}
+
+/**
+ * Formatiert einen Betrag als Währung
+ * @param {number|string} amount - Betrag
+ * @returns {string} Formatierter Betrag mit 2 Dezimalstellen
+ */
+function formatCurrency(amount) {
+  const num = parseFloat(amount);
+  return isNaN(num) ? '0.00' : num.toFixed(2);
+}
+
+/**
+ * Escaped HTML-Sonderzeichen zur XSS-Prävention
+ * @param {string} text - Text zum Escapen
+ * @returns {string} Escapeter Text
+ */
+function escapeHtml(text) {
+  if (!text) return '';
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+/**
+ * Erstellt ein HTML-Element für einen Kosteneintrag
+ * @param {Object} cost - Kosteneintrag
+ * @param {number} index - Index des Eintrags
+ * @returns {HTMLElement} li-Element
+ */
+function createCostElement(cost, index) {
+  const li = document.createElement('li');
+  li.className = 'cost-item';
+  li.setAttribute('data-index', index);
+  
+  li.innerHTML = `
+    <div class="cost-info">
+      <span class="cost-person">${escapeHtml(cost.person)}</span>:
+      <span class="cost-amount">${formatCurrency(cost.amount)}€</span>
+      ${cost.reason ? `<span class="cost-reason">(${escapeHtml(cost.reason)})</span>` : ''}
+    </div>
+    <button class="delete-btn" data-index="${index}" aria-label="Eintrag löschen">
+      Löschen
+    </button>
+  `;
+  return li;
+}
+
+// ============================================
+// RENDER FUNCTIONS
+// ============================================
 
 /**
  * Zeigt alle Kosten in der Liste an
@@ -79,6 +178,10 @@ function deleteCost(index) {
   }
 }
 
+// ============================================
+// FORM HANDLING
+// ============================================
+
 /**
  * Initialisiert das Formular mit Event-Listenern
  */
@@ -147,6 +250,10 @@ function initForm() {
   });
 }
 
+// ============================================
+// EXPORT/IMPORT FUNCTIONS
+// ============================================
+
 /**
  * Exportiert alle Kosten als JSON
  */
@@ -201,6 +308,10 @@ function importCosts(file) {
   
   reader.readAsText(file);
 }
+
+// ============================================
+// INITIALIZATION
+// ============================================
 
 /**
  * Initialisiert die Anwendung

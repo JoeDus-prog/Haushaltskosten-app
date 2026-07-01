@@ -14,7 +14,7 @@ Thumbs.db
 *.swo
 *~
 
-# Node.js (falls später genutzt)
+# Node.js
 node_modules/
 package-lock.json
 npm-debug.log*
@@ -22,6 +22,7 @@ npm-debug.log*
 # Build outputs
 dist/
 build/
+.coverage/
 
 # Logs
 *.log
@@ -31,3 +32,10 @@ npm-debug.log*
 .env
 .env.local
 .env.*.local
+
+# Test coverage
+coverage/
+
+# Temporary files
+tmp/
+temp/

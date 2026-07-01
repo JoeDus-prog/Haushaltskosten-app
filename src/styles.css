@@ -1,5 +1,24 @@
 /* Haushaltskosten-App Styles */
 
+:root {
+  --primary-color: #3498db;
+  --primary-hover: #2980b9;
+  --danger-color: #e74c3c;
+  --danger-hover: #c0392b;
+  --secondary-color: #95a5a6;
+  --secondary-hover: #7f8c8d;
+  --success-color: #2ecc71;
+  --background-color: #f5f7fa;
+  --container-bg: #ffffff;
+  --text-color: #2c3e50;
+  --text-light: #7f8c8d;
+  --border-color: #ddd;
+  --border-radius: 8px;
+  --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --spacing-unit: 15px;
+  --transition: all 0.3s ease;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -9,36 +28,47 @@
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.6;
-  color: #333;
-  background-color: #f5f7fa;
+  color: var(--text-color);
+  background-color: var(--background-color);
   padding: 20px;
+  min-height: 100vh;
 }
 
 .container {
   max-width: 800px;
   margin: 0 auto;
-  background: white;
+  background: var(--container-bg);
   padding: 30px;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
 }
 
-h1 {
+header {
   text-align: center;
-  color: #2c3e50;
   margin-bottom: 30px;
+}
+
+header h1 {
+  color: var(--text-color);
+  margin-bottom: 10px;
   font-size: 2em;
+}
+
+.subtitle {
+  color: var(--text-light);
+  font-size: 1.1em;
+  margin-bottom: 20px;
 }
 
 /* Form Styles */
 .cost-form {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: var(--spacing-unit);
   margin-bottom: 30px;
   background: #f8f9fa;
   padding: 20px;
-  border-radius: 8px;
+  border-radius: var(--border-radius);
 }
 
 .form-group {
@@ -47,37 +77,99 @@ h1 {
   gap: 5px;
 }
 
+.form-group label {
+  font-weight: 600;
+  color: var(--text-color);
+  font-size: 0.9em;
+}
+
 .form-group input {
   padding: 12px;
-  border: 2px solid #ddd;
+  border: 2px solid var(--border-color);
   border-radius: 6px;
   font-size: 16px;
-  transition: border-color 0.3s;
+  transition: var(--transition);
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: #3498db;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
 }
 
 .form-group input::placeholder {
   color: #999;
 }
 
+.form-group input:invalid {
+  border-color: var(--danger-color);
+}
+
+/* Buttons */
 .btn {
   padding: 12px 20px;
-  background-color: #3498db;
+  background-color: var(--primary-color);
   color: white;
   border: none;
   border-radius: 6px;
   cursor: pointer;
   font-size: 16px;
   font-weight: bold;
-  transition: background-color 0.3s;
+  transition: var(--transition);
+  text-align: center;
 }
 
 .btn:hover {
-  background-color: #2980b9;
+  background-color: var(--primary-hover);
+  transform: translateY(-1px);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+}
+
+.btn-secondary {
+  background-color: var(--secondary-color);
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: var(--secondary-hover);
+}
+
+.btn-danger {
+  background-color: var(--danger-color);
+}
+
+.btn-danger:hover {
+  background-color: var(--danger-hover);
+}
+
+/* Actions Bar */
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.actions .btn {
+  flex: 1;
+  min-width: 150px;
 }
 
 /* Summary Styles */
@@ -86,7 +178,7 @@ h1 {
   margin: 20px 0;
   padding: 15px;
   background: #e8f4fc;
-  border-radius: 8px;
+  border-radius: var(--border-radius);
   font-size: 1.2em;
 }
 
@@ -96,7 +188,7 @@ h1 {
 
 #totalAmount {
   font-weight: bold;
-  color: #2c3e50;
+  color: var(--text-color);
   font-size: 1.3em;
 }
 
@@ -110,52 +202,67 @@ h1 {
 
 .cost-list li {
   padding: 15px;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  background: var(--container-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: var(--transition);
 }
 
 .cost-list li:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--box-shadow);
+  border-color: var(--primary-color);
 }
 
 .cost-info {
   flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  align-items: center;
 }
 
 .cost-person {
   font-weight: bold;
-  color: #2c3e50;
+  color: var(--text-color);
 }
 
 .cost-amount {
-  color: #e74c3c;
+  color: var(--danger-color);
   font-weight: bold;
 }
 
 .cost-reason {
-  color: #7f8c8d;
+  color: var(--text-light);
   font-size: 0.9em;
 }
 
 .delete-btn {
-  background: #e74c3c;
+  background: var(--danger-color);
   color: white;
   border: none;
   border-radius: 4px;
   padding: 6px 12px;
   cursor: pointer;
   font-size: 14px;
-  transition: background-color 0.3s;
+  transition: var(--transition);
+  white-space: nowrap;
 }
 
 .delete-btn:hover {
-  background: #c0392b;
+  background: var(--danger-hover);
+}
+
+/* Empty State */
+.cost-list:empty::before {
+  content: 'Keine Kosten vorhanden. Fügen Sie welche hinzu!';
+  color: var(--text-light);
+  text-align: center;
+  padding: 20px;
+  font-style: italic;
 }
 
 /* Responsive Design */
@@ -176,9 +283,53 @@ h1 {
 
   .cost-info {
     width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .delete-btn {
     align-self: flex-end;
+    width: 100%;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .actions .btn {
+    width: 100%;
+  }
+
+  header h1 {
+    font-size: 1.5em;
+  }
+}
+
+/* Accessibility Focus Styles */
+.btn:focus,
+.delete-btn:focus,
+.form-group input:focus {
+  outline: 3px solid #f1c40f;
+  outline-offset: 2px;
+}
+
+/* Print Styles */
+@media print {
+  body {
+    background: white;
+  }
+
+  .container {
+    box-shadow: none;
+    border: 1px solid #ccc;
+  }
+
+  .cost-form,
+  .actions {
+    display: none;
+  }
+
+  .cost-list li {
+    break-inside: avoid;
   }
 }

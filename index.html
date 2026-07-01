@@ -3,35 +3,55 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Einfache Web-App zur Verwaltung von Haushaltskosten mit Übersicht über Ausgaben">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:">
   <title>Haushaltskosten-App</title>
   <link rel="stylesheet" href="src/styles.css">
+  <!-- Für Entwicklung mit ES Modules -->
+  <script type="module" src="src/app.js"></script>
+  <!-- Fallback für Browser ohne Module-Unterstützung -->
+  <script nomodule src="src/app.browser.js"></script>
 </head>
 <body>
   <div class="container">
-    <h1>Wer hat was gezahlt?</h1>
+    <header>
+      <h1>Wer hat was gezahlt?</h1>
+      <p class="subtitle">Einfache Verwaltung von Haushaltskosten</p>
+    </header>
     
-    <form id="costForm" class="cost-form">
+    <form id="costForm" class="cost-form" aria-label="Kosten hinzufügen">
       <div class="form-group">
-        <input type="text" id="person" placeholder="Name" required>
+        <label for="person">Name</label>
+        <input type="text" id="person" placeholder="Name" required aria-required="true">
       </div>
       <div class="form-group">
-        <input type="number" id="amount" placeholder="Betrag (€)" step="0.01" required>
+        <label for="amount">Betrag (€)</label>
+        <input type="number" id="amount" placeholder="Betrag" step="0.01" min="0.01" required aria-required="true">
       </div>
       <div class="form-group">
+        <label for="reason">Grund</label>
         <input type="text" id="reason" placeholder="Grund (z. B. Einkaufen)">
       </div>
-      <button type="submit" class="btn">Hinzufügen</button>
+      <button type="submit" class="btn btn-primary">Hinzufügen</button>
     </form>
 
-    <div class="summary" id="summary">
+    <div class="actions">
+      <button id="exportBtn" class="btn btn-secondary" aria-label="Kosten exportieren">
+        Exportieren
+      </button>
+      <button id="importBtn" class="btn btn-secondary" aria-label="Kosten importieren">
+        Importieren
+      </button>
+      <input type="file" id="fileInput" accept=".json" style="display: none;" aria-label="Datei auswählen">
+    </div>
+
+    <div class="summary" id="summary" aria-live="polite">
       <p>Gesamt: <span id="totalAmount">0€</span></p>
     </div>
 
-    <ul id="costList" class="cost-list">
+    <ul id="costList" class="cost-list" aria-label="Liste der Kosten">
       <!-- Kosten werden dynamisch eingefügt -->
     </ul>
   </div>
-
-  <script src="src/app.js"></script>
 </body>
 </html>
