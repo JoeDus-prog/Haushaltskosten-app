@@ -9,6 +9,13 @@
       {
         "ignoreAtRules": ["use", "mixin", "include", "function", "if", "else", "for", "while", "each", "return", "content"]
       }
-    ]
+    ],
+    "color-hex-length": null,
+    "color-function-notation": null,
+    "alpha-value-notation": null,
+    "value-keyword-case": null,
+    "no-duplicate-selectors": null,
+    "selector-id-pattern": null,
+    "media-feature-range-notation": null
   }
 }

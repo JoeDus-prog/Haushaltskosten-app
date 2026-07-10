@@ -1,27 +1,38 @@
 {
   "name": "haushaltskosten-app",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Eine einfache Web-App zur Verwaltung von Haushaltskosten",
+  "type": "module",
   "main": "index.html",
   "scripts": {
-    "lint": "eslint src/**/*.js",
-    "lint:css": "stylelint **/*.css",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint src/js/**/*.js",
+    "lint:css": "stylelint src/css/**/*.css",
     "lint:all": "npm run lint && npm run lint:css",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "start": "npx serve ."
   },
   "keywords": [
     "haushalt",
     "kosten",
     "budget",
-    "expenses"
+    "expenses",
+    "pwa",
+    "vanilla-js"
   ],
   "author": "JoeDus-prog",
   "license": "MIT",
   "devDependencies": {
     "eslint": "^8.56.0",
+    "jsdom": "^24.0.0",
     "stylelint": "^15.11.0",
     "stylelint-config-standard": "^34.0.0",
-    "serve": "^14.2.1"
+    "serve": "^14.2.1",
+    "vite": "^5.0.0",
+    "vitest": "^1.0.0"
   }
 }
