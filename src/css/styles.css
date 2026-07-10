@@ -1,13 +1,15 @@
 /* Haushaltskosten-App Styles */
 
 :root {
+  /* Shared Colors */
+  --danger-color: #e74c3c;
+  --danger-hover: #c0392b;
+  --success-color: #2ecc71;
+
   /* Light Mode Colors */
   --primary-color: #3498db;
   --primary-hover: #2980b9;
   --secondary-color: #2c3e50;
-  --danger-color: #e74c3c;
-  --danger-hover: #c0392b;
-  --success-color: #2ecc71;
   --light-bg: #f5f7fa;
   --container-bg: #ffffff;
   --text-primary: #333;
@@ -24,9 +26,6 @@
   --primary-color: #4a90e2;
   --primary-hover: #357ab8;
   --secondary-color: #e0e0e0;
-  --danger-color: #e74c3c;
-  --danger-hover: #c0392b;
-  --success-color: #2ecc71;
   --light-bg: #1a1a1a;
   --container-bg: #2a2a2a;
   --text-primary: #f0f0f0;
@@ -38,12 +37,33 @@
   --shadow-hover: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
-* {
+/* CSS Reset */
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
+body,
+h1, h2, h3, h4, h5, h6,
+p, figure, blockquote, dl, dd {
+  margin: 0;
+}
+
+ul[role='list'],
+ol[role='list'] {
+  list-style: none;
+}
+
+body {
+  min-height: 100vh;
+  text-rendering: optimizeSpeed;
+  line-height: 1.5;
+}
+
+/* Base Styles */
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.6;
@@ -223,6 +243,15 @@ h1 {
   background: var(--danger-hover);
 }
 
+/* Empty Message */
+.empty-message {
+  text-align: center;
+  color: var(--text-secondary);
+  font-style: italic;
+  padding: 20px;
+  width: 100%;
+}
+
 /* Responsive Design */
 @media (max-width: 600px) {
   .container {
@@ -263,6 +292,19 @@ h1 {
 .theme-toggle:focus {
   outline: 2px solid var(--primary-color);
   outline-offset: 2px;
+}
+
+/* Visually Hidden for Screen Readers */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* Print Styles */

@@ -1,0 +1,22 @@
+{
+  "name": "Haushaltskosten-App",
+  "short_name": "Haushalt",
+  "description": "Verwalte deine Haushaltskosten einfach und übersichtlich",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5f7fa",
+  "theme_color": "#3498db",
+  "icons": [
+    {
+      "src": "assets/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

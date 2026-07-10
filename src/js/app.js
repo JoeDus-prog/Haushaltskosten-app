@@ -1,17 +1,22 @@
 /**
  * Haushaltskosten-App
- * Verwaltung von Haushaltskosten mit localStorage
+ * Main application module
  */
 
-// Selektoren als Konstanten
-const SELECTORS = {
-  costForm: '#costForm',
-  person: '#person',
-  amount: '#amount',
-  reason: '#reason',
-  costList: '#costList',
-  totalAmount: '#totalAmount'
-};
+import { 
+  getCosts, 
+  addCost, 
+  removeCost, 
+  calculateTotal,
+  initializeStorage 
+} from './storage.js';
+import { 
+  sanitizeInput, 
+  validatePerson, 
+  validateAmount, 
+  validateReason 
+} from './validation.js';
+import { formatAmount } from './utils.js';
 
 // DOM-Elemente cachen
 const elements = {
@@ -23,71 +28,22 @@ const elements = {
   totalAmount: document.getElementById('totalAmount')
 };
 
-/**
- * Sanitize user input to prevent XSS
- * @param {string} input - User input to sanitize
- * @returns {string} Sanitized input
- */
-function sanitizeInput(input) {
-  if (!input) return '';
-  return input
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
-
-/**
- * Validate amount input
- * @param {string} amount - Amount to validate
- * @returns {boolean} Is valid
- */
-function validateAmount(amount) {
-  if (!amount || amount.trim() === '') return false;
-  const num = parseFloat(amount);
-  return !isNaN(num) && num >= 0;
-}
-
-/**
- * Validate person input
- * @param {string} person - Person name to validate
- * @returns {boolean} Is valid
- */
-function validatePerson(person) {
-  return person && person.trim().length > 0 && person.trim().length <= 50;
-}
-
-/**
- * Validate reason input
- * @param {string} reason - Reason to validate
- * @returns {boolean} Is valid
- */
-function validateReason(reason) {
-  return !reason || (reason.trim().length > 0 && reason.trim().length <= 100);
-}
-
-// Kosten aus localStorage laden
-function loadCosts() {
-  const savedCosts = localStorage.getItem('haushaltskosten');
-  return savedCosts ? JSON.parse(savedCosts) : [];
-}
-
-// Kosten in localStorage speichern
-function saveCosts(costs) {
-  localStorage.setItem('haushaltskosten', JSON.stringify(costs));
-}
-
-// Gesamtbetrag berechnen
-function calculateTotal(costs) {
-  return costs.reduce((total, cost) => total + parseFloat(cost.amount) || 0, 0);
-}
-
 // Kosten in der Liste anzeigen
 function renderCosts() {
-  const costs = loadCosts();
+  const costs = getCosts();
   
   // Liste leeren
   elements.costList.innerHTML = '';
+
+  if (costs.length === 0) {
+    elements.costList.innerHTML = `
+      <li class="empty-message">
+        Keine Kosten vorhanden. Füge einen neuen Eintrag hinzu!
+      </li>
+    `;
+    elements.totalAmount.textContent = '0€';
+    return;
+  }
 
   // Jeden Kosteneintrag hinzufügen
   costs.forEach((cost, index) => {
@@ -106,25 +62,7 @@ function renderCosts() {
 
   // Gesamtbetrag aktualisieren
   const total = calculateTotal(costs);
-  elements.totalAmount.textContent = `${total.toFixed(2)}€`;
-}
-
-// Neuen Kosteneintrag hinzufügen
-function addCost(person, amount, reason) {
-  const costs = loadCosts();
-  costs.push({ person, amount, reason });
-  saveCosts(costs);
-  renderCosts();
-}
-
-// Kosteneintrag löschen
-function deleteCost(index) {
-  const costs = loadCosts();
-  if (index >= 0 && index < costs.length) {
-    costs.splice(index, 1);
-    saveCosts(costs);
-    renderCosts();
-  }
+  elements.totalAmount.textContent = `${formatAmount(total)}€`;
 }
 
 // Formular-Event-Listener mit Event Delegation
@@ -149,21 +87,28 @@ function initForm() {
       return;
     }
 
-    if (!validateReason(reason)) {
+    if (reason && !validateReason(reason)) {
       alert('Der Grund darf maximal 100 Zeichen lang sein.');
       elements.reason.focus();
       return;
     }
 
     // Betrag als Zahl formatieren (2 Dezimalstellen)
-    const amountNum = parseFloat(amount).toFixed(2);
+    const amountNum = formatAmount(amount);
 
     // Kosten hinzufügen
-    addCost(sanitizeInput(person), amountNum, sanitizeInput(reason));
+    addCost({
+      person: sanitizeInput(person),
+      amount: amountNum,
+      reason: sanitizeInput(reason)
+    });
 
     // Formular zurücksetzen
     elements.costForm.reset();
     elements.person.focus();
+    
+    // Liste aktualisieren
+    renderCosts();
   });
 }
 
@@ -173,22 +118,48 @@ function initEventDelegation() {
     if (e.target.classList.contains('delete-btn')) {
       const index = parseInt(e.target.getAttribute('data-index'));
       if (!isNaN(index)) {
-        deleteCost(index);
+        // Bestätigungsdialog
+        if (confirm('Möchtest du diesen Eintrag wirklich löschen?')) {
+          removeCost(index);
+          renderCosts();
+        }
       }
+    }
+  });
+}
+
+// Auto-Focus und Enter-Navigation
+function initFormNavigation() {
+  // Auto-Focus auf erstes Feld
+  elements.person.focus();
+  
+  // Enter-Navigation
+  elements.person.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      elements.amount.focus();
+    }
+  });
+  
+  elements.amount.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      elements.reason.focus();
+    }
+  });
+  
+  elements.reason.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      elements.costForm.dispatchEvent(new Event('submit'));
     }
   });
 }
 
 // Initialisierung
 function init() {
-  // Standard-Kosten hinzufügen, falls keine vorhanden
-  const costs = loadCosts();
-  if (costs.length === 0) {
-    saveCosts([
-      { person: 'Max', amount: '50.00', reason: 'Einkaufen' },
-      { person: 'Anna', amount: '30.00', reason: 'Strom' }
-    ]);
-  }
+  // Storage initialisieren
+  initializeStorage();
 
   // Kosten anzeigen
   renderCosts();
@@ -198,6 +169,9 @@ function init() {
   
   // Event Delegation initialisieren
   initEventDelegation();
+  
+  // Formular-Navigation initialisieren
+  initFormNavigation();
 }
 
 // beim Laden der Seite ausführen
