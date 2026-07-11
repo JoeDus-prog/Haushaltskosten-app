@@ -8,6 +8,9 @@
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
+  "globals": {
+    "Chart": "readonly"
+  },
   "rules": {
     "indent": ["error", 2],
     "linebreak-style": ["error", "unix"],

@@ -193,6 +193,39 @@ h1 {
   font-size: 14px;
 }
 
+/* Charts Container Styles */
+.charts-container {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  margin-bottom: 30px;
+}
+
+.chart-wrapper {
+  background: var(--form-bg);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+}
+
+.chart-wrapper h3 {
+  text-align: center;
+  color: var(--secondary-color);
+  margin-bottom: 15px;
+  font-size: 1.1em;
+}
+
+.chart-container {
+  position: relative;
+  height: 300px;
+  width: 100%;
+}
+
+.chart-container canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
 /* Cost List Styles */
 .cost-list {
   list-style: none;
@@ -252,6 +285,16 @@ h1 {
 }
 
 /* Responsive Design */
+@media (max-width: 768px) {
+  .charts-container {
+    gap: 20px;
+  }
+
+  .chart-container {
+    height: 250px;
+  }
+}
+
 @media (max-width: 600px) {
   .container {
     padding: 20px;
@@ -290,6 +333,14 @@ h1 {
   .export-import-buttons .btn {
     width: 100%;
   }
+
+  .charts-container {
+    gap: 15px;
+  }
+
+  .chart-container {
+    height: 200px;
+  }
 }
 
 /* Focus Styles for Accessibility */
@@ -305,7 +356,8 @@ h1 {
 @media print {
   .theme-toggle,
   .btn,
-  .export-import-container {
+  .export-import-container,
+  .charts-container {
     display: none;
   }
   

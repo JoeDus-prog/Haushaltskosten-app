@@ -7,15 +7,17 @@ import { loadCosts, calculateTotal, addCost, deleteCost, initializeDefaultCosts 
 import { validateFormData, formatAmount, sanitizeInput } from "./validation.js";
 import { initElements, renderCosts, updateTotalAmount, showError, resetForm, onFormSubmit, onDeleteClick, getElements } from "./dom.js";
 import { initExportImport } from "./export.js";
+import { initCharts, updateCharts } from "./charts.js";
 
 /**
- * Rendert alle Kosten und aktualisiert den Gesamtbetrag
+ * Rendert alle Kosten, aktualisiert den Gesamtbetrag und die Diagramme
  */
 function renderAll() {
   const costs = loadCosts();
   renderCosts(costs);
   const total = calculateTotal(costs);
   updateTotalAmount(total);
+  updateCharts();
 }
 
 /**
@@ -88,6 +90,9 @@ function init() {
 
   // Export/Import initialisieren
   initExportImport(renderAll);
+
+  // Diagramme initialisieren
+  initCharts();
 }
 
 // beim Laden der Seite ausführen
