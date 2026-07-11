@@ -10,5 +10,6 @@
         "ignoreAtRules": ["use", "mixin", "include", "function", "if", "else", "for", "while", "each", "return", "content"]
       }
     ]
-  }
+  },
+  "ignoreFiles": ["node_modules/**", "dist/**"]
 }

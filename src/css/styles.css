@@ -145,6 +145,15 @@ h1 {
   background-color: var(--primary-hover);
 }
 
+/* Secondary Button Style */
+.btn-secondary {
+  background-color: var(--success-color);
+}
+
+.btn-secondary:hover {
+  background-color: #27ae60;
+}
+
 /* Summary Styles */
 .summary {
   text-align: center;
@@ -163,6 +172,58 @@ h1 {
   font-weight: bold;
   color: var(--secondary-color);
   font-size: 1.3em;
+}
+
+/* Export/Import Styles */
+.export-import-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.export-import-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.export-import-buttons .btn {
+  padding: 10px 16px;
+  font-size: 14px;
+}
+
+/* Charts Container Styles */
+.charts-container {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  margin-bottom: 30px;
+}
+
+.chart-wrapper {
+  background: var(--form-bg);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+}
+
+.chart-wrapper h3 {
+  text-align: center;
+  color: var(--secondary-color);
+  margin-bottom: 15px;
+  font-size: 1.1em;
+}
+
+.chart-container {
+  position: relative;
+  height: 300px;
+  width: 100%;
+}
+
+.chart-container canvas {
+  width: 100% !important;
+  height: 100% !important;
 }
 
 /* Cost List Styles */
@@ -224,6 +285,16 @@ h1 {
 }
 
 /* Responsive Design */
+@media (max-width: 768px) {
+  .charts-container {
+    gap: 20px;
+  }
+
+  .chart-container {
+    height: 250px;
+  }
+}
+
 @media (max-width: 600px) {
   .container {
     padding: 20px;
@@ -254,6 +325,22 @@ h1 {
     height: 36px;
     font-size: 16px;
   }
+
+  .export-import-buttons {
+    flex-direction: column;
+  }
+
+  .export-import-buttons .btn {
+    width: 100%;
+  }
+
+  .charts-container {
+    gap: 15px;
+  }
+
+  .chart-container {
+    height: 200px;
+  }
 }
 
 /* Focus Styles for Accessibility */
@@ -268,7 +355,9 @@ h1 {
 /* Print Styles */
 @media print {
   .theme-toggle,
-  .btn {
+  .btn,
+  .export-import-container,
+  .charts-container {
     display: none;
   }
   

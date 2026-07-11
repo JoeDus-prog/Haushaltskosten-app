@@ -6,10 +6,10 @@
   <meta name="description" content="Haushaltskosten-App zur Verwaltung von Ausgaben">
   <meta name="author" content="JoeDus-prog">
   <title>Haushaltskosten-App</title>
-  <link rel="stylesheet" href="src/styles.css">
+  <link rel="stylesheet" href="src/css/styles.css">
 </head>
 <body>
-  <button class="theme-toggle" id="themeToggle" aria-label="Theme umschalten">🌓</button>
+  <button class="theme-toggle" id="themeToggle" aria-label="Theme umschalten">🌍</button>
   
   <div class="container">
     <h1>Wer hat was gezahlt?</h1>
@@ -36,9 +36,8 @@
     </ul>
   </div>
 
-  <script src="src/app.js"></script>
+  <!-- Theme Toggle Script (bleibt inline für frühe Verfügbarkeit) -->
   <script>
-    // Theme Toggle Functionality
     document.addEventListener('DOMContentLoaded', function() {
       const themeToggle = document.getElementById('themeToggle');
       const html = document.documentElement;
@@ -61,17 +60,20 @@
         localStorage.setItem('theme', newTheme);
         
         // Update button icon
-        themeToggle.textContent = newTheme === 'dark' ? '☀️' : '🌓';
+        themeToggle.textContent = newTheme === 'dark' ? '☀️' : '🌍';
       });
       
       // Watch for system theme changes
       window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
         if (!localStorage.getItem('theme')) {
           html.setAttribute('data-theme', e.matches ? 'dark' : 'light');
-          themeToggle.textContent = e.matches ? '☀️' : '🌓';
+          themeToggle.textContent = e.matches ? '☀️' : '🌍';
         }
       });
     });
   </script>
+
+  <!-- Main Application Script (ES6 Module) -->
+  <script type="module" src="src/js/main.js"></script>
 </body>
 </html>
