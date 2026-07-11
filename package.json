@@ -2,13 +2,15 @@
   "name": "haushaltskosten-app",
   "version": "1.0.0",
   "description": "Eine einfache Web-App zur Verwaltung von Haushaltskosten",
+  "type": "module",
   "main": "index.html",
   "scripts": {
     "lint": "eslint src/**/*.js",
-    "lint:css": "stylelint **/*.css",
+    "lint:css": "stylelint src/**/*.css",
     "lint:all": "npm run lint && npm run lint:css",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npx serve ."
+    "start": "npx serve .",
+    "dev": "npx serve ."
   },
   "keywords": [
     "haushalt",
