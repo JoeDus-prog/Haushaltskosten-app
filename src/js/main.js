@@ -6,6 +6,7 @@
 import { loadCosts, calculateTotal, addCost, deleteCost, initializeDefaultCosts } from "./storage.js";
 import { validateFormData, formatAmount, sanitizeInput } from "./validation.js";
 import { initElements, renderCosts, updateTotalAmount, showError, resetForm, onFormSubmit, onDeleteClick, getElements } from "./dom.js";
+import { initExportImport } from "./export.js";
 
 /**
  * Rendert alle Kosten und aktualisiert den Gesamtbetrag
@@ -84,6 +85,9 @@ function init() {
   // Event-Listener registrieren
   onFormSubmit(handleFormSubmit);
   onDeleteClick(handleDeleteClick);
+
+  // Export/Import initialisieren
+  initExportImport(renderAll);
 }
 
 // beim Laden der Seite ausführen
