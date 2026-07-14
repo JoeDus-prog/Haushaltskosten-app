@@ -3,13 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Haushaltskosten-App zur Verwaltung von Ausgaben">
+  <meta name="description" content="Verwalte deine Haushaltskosten einfach und übersichtlich mit dieser Web-App.">
+  <meta name="keywords" content="Haushalt, Kosten, Budget, Ausgaben, Verwaltung">
   <meta name="author" content="JoeDus-prog">
+  <meta property="og:title" content="Haushaltskosten-App">
+  <meta property="og:description" content="Eine einfache Web-App zur Verwaltung von Haushaltskosten.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://joedus-prog.github.io/Haushaltskosten-app/">
+  <meta name="twitter:card" content="summary">
   <title>Haushaltskosten-App</title>
-  <link rel="stylesheet" href="src/styles.css">
+  <link rel="stylesheet" href="src/css/styles.css">
 </head>
 <body>
-  <button class="theme-toggle" id="themeToggle" aria-label="Theme umschalten">🌓</button>
+  <button class="theme-toggle" id="themeToggle" aria-label="Theme umschalten">🌍</button>
   
   <div class="container">
     <h1>Wer hat was gezahlt?</h1>
@@ -31,47 +37,11 @@
       <p>Gesamt: <span id="totalAmount">0€</span></p>
     </div>
 
-    <ul id="costList" class="cost-list">
+    <div id="costList" class="cost-list" role="list" aria-label="Liste der Haushaltskosten">
       <!-- Kosten werden dynamisch eingefügt -->
-    </ul>
+    </div>
   </div>
 
-  <script src="src/app.js"></script>
-  <script>
-    // Theme Toggle Functionality
-    document.addEventListener('DOMContentLoaded', function() {
-      const themeToggle = document.getElementById('themeToggle');
-      const html = document.documentElement;
-      
-      // Load saved theme or use system preference
-      const savedTheme = localStorage.getItem('theme');
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      
-      if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-        html.setAttribute('data-theme', 'dark');
-        themeToggle.textContent = '☀️';
-      }
-      
-      // Toggle theme
-      themeToggle.addEventListener('click', function() {
-        const currentTheme = html.getAttribute('data-theme');
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        
-        html.setAttribute('data-theme', newTheme);
-        localStorage.setItem('theme', newTheme);
-        
-        // Update button icon
-        themeToggle.textContent = newTheme === 'dark' ? '☀️' : '🌓';
-      });
-      
-      // Watch for system theme changes
-      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-        if (!localStorage.getItem('theme')) {
-          html.setAttribute('data-theme', e.matches ? 'dark' : 'light');
-          themeToggle.textContent = e.matches ? '☀️' : '🌓';
-        }
-      });
-    });
-  </script>
+  <script type="module" src="src/js/app.js"></script>
 </body>
 </html>

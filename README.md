@@ -2,13 +2,14 @@
 
 Eine einfache Web-App zur Verwaltung von Haushaltskosten (z. B. für Lebensmittel, Kosmetikartikel, Strom, Miete), um stets einen konkreten und schnellen Überblick über die Ausgaben zu haben.
 
-## ✨ Funktionen
+## 🎯 Funktionen
 
 - **Kosten hinzufügen**: Name, Betrag und Grund eingeben
 - **Kosten löschen**: Einträge mit einem Klick entfernen
 - **Gesamtübersicht**: Automatische Berechnung der Gesamtsumme
 - **Datenpersistenz**: Alle Einträge werden im Browser gespeichert (`localStorage`)
 - **Responsive Design**: Optimiert für Desktop und Mobile
+- **Dark Mode**: Automatische Erkennung oder manueller Toggle
 
 ## 🚀 Schnellstart
 
@@ -25,19 +26,34 @@ git clone https://github.com/JoeDus-prog/Haushaltskosten-app.git
 # In den Projektordner wechseln
 cd Haushaltskosten-app
 
-# index.html im Browser öffnen
+# Abhängigkeiten installieren
+npm install
+
+# Entwicklungsserver starten (mit Hot-Reloading)
+npm run dev
+
+# Für Produktion bauen
+npm run build
 ```
 
 ## 📁 Projektstruktur
 
 ```
 Haushaltskosten-app/
-├── index.html          # Haupt-HTML-Datei
-├── README.md           # Projektbeschreibung
+├── index.html              # Haupt-HTML-Datei
+├── package.json            # Projektkonfiguration
+├── README.md               # Projektbeschreibung
+├── vite.config.js          # Vite-Konfiguration
+├── vitest.config.js        # Test-Konfiguration
+├── .eslintrc.json          # ESLint-Konfiguration
+├── .stylelintrc.json       # Stylelint-Konfiguration
+├── .gitignore              # Ignorierte Dateien
 ├── /src
-│   ├── app.js          # JavaScript-Logik (Datenverwaltung)
-│   └── styles.css      # CSS-Stile
-└── /assets             # Für Bilder/Icons (optional)
+│   ├── /js
+│   │   └── app.js          # JavaScript-Logik (Datenverwaltung)
+│   └── /css
+│       └── styles.css      # CSS-Stile
+└── /assets                 # Für Bilder/Icons (optional)
 ```
 
 ## 🛠 Technologien
@@ -46,8 +62,12 @@ Haushaltskosten-app/
 - **CSS3** – Styling und Responsive Design
 - **Vanilla JavaScript** – Logik und Interaktivität
 - **localStorage** – Speicherung der Daten im Browser
+- **Vite** – Bundling und Entwicklungsserver
+- **Vitest** – Testing-Framework
+- **ESLint** – JavaScript-Linting
+- **Stylelint** – CSS-Linting
 
-## 💡 Verwendung
+## 📝 Verwendung
 
 1. **Kosten hinzufügen**:
    - Name der Person eingeben (z. B. "Max")
@@ -61,7 +81,10 @@ Haushaltskosten-app/
 3. **Gesamtsumme**:
    - Wird automatisch aktualisiert und angezeigt
 
-## 📝 Datenformat
+4. **Theme umschalten**:
+   - Klicke auf den Button in der oberen rechten Ecke (🌍/☀️/🌙)
+
+## 📊 Datenformat
 
 Die Kosten werden als JSON-Array im `localStorage` gespeichert:
 
@@ -69,18 +92,30 @@ Die Kosten werden als JSON-Array im `localStorage` gespeichert:
 [
   {
     "person": "Max",
-    "amount": "50.00",
+    "amount": 50.00,
     "reason": "Einkaufen"
   },
   {
     "person": "Anna",
-    "amount": "30.00",
+    "amount": 30.00,
     "reason": "Strom"
   }
 ]
 ```
 
-## 🔧 Erweiterungsmöglichkeiten
+## 🔧 Skripte
+
+| Skript       | Beschreibung                                  |
+|--------------|----------------------------------------------|
+| `npm run dev`    | Startet den Entwicklungsserver mit Hot-Reloading |
+| `npm run build`  | Erstellt eine optimierte Produktionsversion   |
+| `npm run preview`| Zeigt die gebaute Version lokal an           |
+| `npm run lint`   | Führt ESLint für JavaScript aus               |
+| `npm run lint:css`| Führt Stylelint für CSS aus                  |
+| `npm run lint:all`| Führt alle Linting-Checks aus                |
+| `npm test`       | Führt Tests mit Vitest aus                    |
+
+## 🌟 Erweiterungsmöglichkeiten
 
 - [ ] **Kategorien**: Kosten nach Kategorien filtern (z. B. "Lebensmittel", "Haushalt")
 - [ ] **Diagramme**: Visualisierung der Ausgaben mit Chart.js
@@ -88,6 +123,7 @@ Die Kosten werden als JSON-Array im `localStorage` gespeichert:
 - [ ] **Export/Import**: Daten als CSV/JSON exportieren/importieren
 - [ ] **Backend-Integration**: Speicherung in einer Datenbank (z. B. Firebase)
 - [ ] **Mehrsprachigkeit**: Unterstützung für weitere Sprachen
+- [ ] **PWA**: Installierbar als Progressive Web App
 
 ## 🤝 Beitrag leisten
 
@@ -97,9 +133,9 @@ Die Kosten werden als JSON-Array im `localStorage` gespeichert:
 4. Push zum Branch (`git push origin feat/neue-funktion`)
 5. Öffne einen Pull Request
 
-## 📄 Lizenz
+## 📜 Lizenz
 
-Dieses Projekt ist Open Source und kann frei verwendet werden.
+Dieses Projekt ist Open Source und kann frei verwendet werden (MIT-Lizenz).
 
 ---
 

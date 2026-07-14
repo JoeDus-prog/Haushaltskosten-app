@@ -35,3 +35,6 @@ npm-debug.log*
 # Lint cache
 .eslintcache
 .stylelintcache
+
+# Vite cache
+.vite/

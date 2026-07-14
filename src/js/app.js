@@ -68,8 +68,13 @@ function validateReason(reason) {
 
 // Kosten aus localStorage laden
 function loadCosts() {
-  const savedCosts = localStorage.getItem('haushaltskosten');
-  return savedCosts ? JSON.parse(savedCosts) : [];
+  try {
+    const savedCosts = localStorage.getItem('haushaltskosten');
+    return savedCosts ? JSON.parse(savedCosts) : [];
+  } catch (e) {
+    console.error('Fehler beim Laden der Kosten:', e);
+    return [];
+  }
 }
 
 // Kosten in localStorage speichern
@@ -79,7 +84,7 @@ function saveCosts(costs) {
 
 // Gesamtbetrag berechnen
 function calculateTotal(costs) {
-  return costs.reduce((total, cost) => total + parseFloat(cost.amount) || 0, 0);
+  return costs.reduce((total, cost) => total + (typeof cost.amount === 'number' ? cost.amount : parseFloat(cost.amount) || 0), 0);
 }
 
 // Kosten in der Liste anzeigen
@@ -91,12 +96,13 @@ function renderCosts() {
 
   // Jeden Kosteneintrag hinzufügen
   costs.forEach((cost, index) => {
-    const li = document.createElement('li');
+    const li = document.createElement('div');
+    li.setAttribute('role', 'listitem');
     li.dataset.index = index;
     li.innerHTML = `
       <div class="cost-info">
         <span class="cost-person">${sanitizeInput(cost.person)}</span>:
-        <span class="cost-amount">${sanitizeInput(cost.amount)}€</span>
+        <span class="cost-amount">${typeof cost.amount === 'number' ? cost.amount.toFixed(2) : cost.amount}€</span>
         ${cost.reason ? `<span class="cost-reason">(${sanitizeInput(cost.reason)})</span>` : ''}
       </div>
       <button class="delete-btn" data-index="${index}" aria-label="Eintrag löschen">Löschen</button>
@@ -112,7 +118,7 @@ function renderCosts() {
 // Neuen Kosteneintrag hinzufügen
 function addCost(person, amount, reason) {
   const costs = loadCosts();
-  costs.push({ person, amount, reason });
+  costs.push({ person, amount: parseFloat(amount), reason });
   saveCosts(costs);
   renderCosts();
 }
@@ -155,11 +161,8 @@ function initForm() {
       return;
     }
 
-    // Betrag als Zahl formatieren (2 Dezimalstellen)
-    const amountNum = parseFloat(amount).toFixed(2);
-
     // Kosten hinzufügen
-    addCost(sanitizeInput(person), amountNum, sanitizeInput(reason));
+    addCost(sanitizeInput(person), amount, sanitizeInput(reason));
 
     // Formular zurücksetzen
     elements.costForm.reset();
@@ -185,8 +188,8 @@ function init() {
   const costs = loadCosts();
   if (costs.length === 0) {
     saveCosts([
-      { person: 'Max', amount: '50.00', reason: 'Einkaufen' },
-      { person: 'Anna', amount: '30.00', reason: 'Strom' }
+      { person: 'Max', amount: 50.00, reason: 'Einkaufen' },
+      { person: 'Anna', amount: 30.00, reason: 'Strom' }
     ]);
   }
 
