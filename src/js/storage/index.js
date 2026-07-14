@@ -10,7 +10,31 @@ const STORAGE_KEY = 'haushaltskosten';
  * @property {number} amount - Betrag (als Number)
  * @property {string} [reason] - Optional: Grund für die Ausgabe
  * @property {string} [category] - Optional: Kategorie
+ * @property {string} [date] - Optional: Datum (YYYY-MM-DD)
  */
+
+/**
+ * Get current date as YYYY-MM-DD string
+ * @returns {string} Current date in YYYY-MM-DD format
+ */
+export function getCurrentDate() {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+/**
+ * Format date for display (DD.MM.YYYY)
+ * @param {string} date - Date in YYYY-MM-DD format
+ * @returns {string} Formatted date
+ */
+export function formatDate(date) {
+  if (!date) return '';
+  const [year, month, day] = date.split('-');
+  return `${day}.${month}.${year}`;
+}
 
 /**
  * Load costs from localStorage
@@ -23,10 +47,11 @@ export function loadCosts() {
     
     const parsed = JSON.parse(savedCosts);
     
-    // Normalize amounts to numbers (for backward compatibility)
+    // Normalize amounts to numbers and add default date if missing
     return parsed.map(cost => ({
       ...cost,
-      amount: typeof cost.amount === 'number' ? cost.amount : parseFloat(cost.amount) || 0
+      amount: typeof cost.amount === 'number' ? cost.amount : parseFloat(cost.amount) || 0,
+      date: cost.date || getCurrentDate()
     }));
   } catch (e) {
     console.error('Fehler beim Laden der Kosten:', e);
@@ -48,14 +73,16 @@ export function saveCosts(costs) {
  * @param {number|string} amount - Amount
  * @param {string} [reason] - Optional reason
  * @param {string} [category] - Optional category
+ * @param {string} [date] - Optional date (YYYY-MM-DD)
  */
-export function addCost(person, amount, reason = '', category = '') {
+export function addCost(person, amount, reason = '', category = '', date = '') {
   const costs = loadCosts();
   costs.push({ 
     person, 
     amount: parseFloat(amount), 
     reason: reason || undefined,
-    category: category || undefined
+    category: category || undefined,
+    date: date || getCurrentDate()
   });
   saveCosts(costs);
 }
@@ -127,6 +154,55 @@ export function filterCostsByCategory(category = '') {
 }
 
 /**
+ * Filter costs by date range
+ * @param {string} [dateFilter] - Date filter ('today', 'week', 'month', 'year', 'custom')
+ * @param {string} [startDate] - Start date for custom range (YYYY-MM-DD)
+ * @param {string} [endDate] - End date for custom range (YYYY-MM-DD)
+ * @returns {Cost[]} Filtered costs
+ */
+export function filterCostsByDate(dateFilter = '', startDate = '', endDate = '') {
+  const costs = loadCosts();
+  const today = new Date();
+  
+  if (!dateFilter) return costs;
+  
+  return costs.filter(cost => {
+    if (!cost.date) return true;
+    
+    const costDate = new Date(cost.date + 'T00:00:00');
+    
+    switch (dateFilter) {
+      case 'today':
+        return costDate.toDateString() === today.toDateString();
+      
+      case 'week':
+        const weekAgo = new Date(today);
+        weekAgo.setDate(today.getDate() - 7);
+        return costDate >= weekAgo && costDate <= today;
+      
+      case 'month':
+        const monthAgo = new Date(today);
+        monthAgo.setMonth(today.getMonth() - 1);
+        return costDate >= monthAgo && costDate <= today;
+      
+      case 'year':
+        const yearAgo = new Date(today);
+        yearAgo.setFullYear(today.getFullYear() - 1);
+        return costDate >= yearAgo && costDate <= today;
+      
+      case 'custom':
+        if (!startDate || !endDate) return true;
+        const start = new Date(startDate + 'T00:00:00');
+        const end = new Date(endDate + 'T23:59:59');
+        return costDate >= start && costDate <= end;
+      
+      default:
+        return true;
+    }
+  });
+}
+
+/**
  * Get all unique categories
  * @returns {string[]} Array of unique categories
  */
@@ -144,14 +220,41 @@ export function getAllCategories() {
 }
 
 /**
+ * Get all unique dates
+ * @returns {string[]} Array of unique dates (YYYY-MM-DD)
+ */
+export function getAllDates() {
+  const costs = loadCosts();
+  const dates = new Set();
+  
+  costs.forEach(cost => {
+    if (cost.date) {
+      dates.add(cost.date);
+    }
+  });
+  
+  return Array.from(dates).sort().reverse();
+}
+
+/**
+ * Get date range for custom filter
+ * @param {string} startDate - Start date (YYYY-MM-DD)
+ * @param {string} endDate - End date (YYYY-MM-DD)
+ * @returns {Object} Object with start and end dates
+ */
+export function getDateRange(startDate, endDate) {
+  return { startDate, endDate };
+}
+
+/**
  * Initialize storage with default costs if empty
  */
 export function initializeStorage() {
   const costs = loadCosts();
   if (costs.length === 0) {
     saveCosts([
-      { person: 'Max', amount: 50.00, reason: 'Einkaufen', category: 'Lebensmittel' },
-      { person: 'Anna', amount: 30.00, reason: 'Strom', category: 'Haushalt' }
+      { person: 'Max', amount: 50.00, reason: 'Einkaufen', category: 'Lebensmittel', date: getCurrentDate() },
+      { person: 'Anna', amount: 30.00, reason: 'Strom', category: 'Haushalt', date: getCurrentDate() }
     ]);
   }
 }
@@ -169,6 +272,9 @@ export function clearAllCosts() {
  */
 export function importCosts(newCosts) {
   const existingCosts = loadCosts();
-  const mergedCosts = [...existingCosts, ...newCosts];
+  const mergedCosts = [...existingCosts, ...newCosts.map(cost => ({
+    ...cost,
+    date: cost.date || getCurrentDate()
+  }))];
   saveCosts(mergedCosts);
 }

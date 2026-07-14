@@ -182,6 +182,10 @@ h1 {
   color: var(--color-text-primary);
 }
 
+.form-group input[type="date"] {
+  padding: 10px;
+}
+
 .form-group input:focus,
 .form-group select:focus {
   outline: none;
@@ -225,50 +229,6 @@ h1 {
   background-color: var(--color-danger-hover);
 }
 
-/* Filter Group */
-.filter-group {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-  margin-bottom: var(--spacing-md);
-  padding: var(--spacing-md);
-  background: var(--color-form-bg);
-  border-radius: var(--border-radius-md);
-}
-
-.filter-group label {
-  font-size: var(--font-size-base);
-  color: var(--color-text-secondary);
-  white-space: nowrap;
-}
-
-.filter-group select {
-  flex: 1;
-  max-width: 300px;
-  padding: 10px;
-  border: 2px solid var(--color-border);
-  border-radius: var(--border-radius-sm);
-  font-size: var(--font-size-base);
-  background-color: var(--color-surface);
-  color: var(--color-text-primary);
-}
-
-/* Export Group */
-.export-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-sm);
-  margin-bottom: var(--spacing-lg);
-  padding: var(--spacing-md);
-  background: var(--color-form-bg);
-  border-radius: var(--border-radius-md);
-}
-
-.export-group .btn {
-  flex: 1;
-  min-width: 120px;
-}
-
 /* Summary Styles */
 .summary {
   text-align: center;
@@ -287,6 +247,77 @@ h1 {
   font-weight: bold;
   color: var(--color-secondary);
   font-size: 1.3em;
+}
+
+/* Export Group */
+.export-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-md);
+  background: var(--color-form-bg);
+  border-radius: var(--border-radius-md);
+}
+
+.export-group .btn {
+  flex: 1;
+  min-width: 120px;
+}
+
+/* Filters Group */
+.filters-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-md);
+  background: var(--color-form-bg);
+  border-radius: var(--border-radius-md);
+}
+
+.filter-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.filter-item label {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.filter-item select {
+  padding: 10px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-base);
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+}
+
+/* Custom Date Container */
+.custom-date-container {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.custom-date-container input[type="date"] {
+  padding: 8px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-sm);
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+}
+
+.custom-date-container span {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
 }
 
 /* Cost List Styles */
@@ -320,6 +351,12 @@ h1 {
   flex-wrap: wrap;
   align-items: center;
   gap: var(--spacing-xs);
+}
+
+.cost-date {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-right: var(--spacing-xs);
 }
 
 .cost-person {
@@ -395,13 +432,17 @@ h1 {
     padding: 10px;
   }
 
-  .filter-group {
+  .filters-group {
     flex-direction: column;
-    align-items: stretch;
+    gap: var(--spacing-sm);
   }
 
-  .filter-group select {
-    max-width: 100%;
+  .filter-item {
+    width: 100%;
+  }
+
+  .filter-item select {
+    flex: 1;
   }
 
   .export-group {
@@ -410,6 +451,11 @@ h1 {
 
   .export-group .btn {
     width: 100%;
+  }
+
+  .custom-date-container {
+    flex-direction: column;
+    align-items: stretch;
   }
 }
 
@@ -431,6 +477,8 @@ h1 {
 
   .cost-info {
     width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .delete-btn {
@@ -440,6 +488,10 @@ h1 {
   .chart-container {
     height: 250px;
   }
+
+  .filters-group {
+    gap: var(--spacing-xs);
+  }
 }
 
 /* Focus Styles for Accessibility */
@@ -448,7 +500,8 @@ h1 {
 .form-group input:focus,
 .form-group select:focus,
 .theme-toggle:focus,
-.filter-group select:focus {
+.filter-item select:focus,
+.custom-date-container input:focus {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
@@ -458,7 +511,8 @@ h1 {
   .theme-toggle,
   .btn,
   .export-group,
-  .filter-group {
+  .filters-group,
+  .custom-date-container {
     display: none;
   }
   
