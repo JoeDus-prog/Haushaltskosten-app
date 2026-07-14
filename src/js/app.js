@@ -1,6 +1,6 @@
 /**
  * Haushaltskosten-App
- * Hauptmodul - Verwaltung von Haushaltskosten mit localStorage
+ * Hauptmodul - Verwaltung von Haushaltskosten mit Firebase/localStorage
  */
 
 import { 
@@ -20,7 +20,9 @@ import {
   getCurrentDate,
   initializeStorage,
   importCosts,
-  clearAllCosts
+  clearAllCosts,
+  setCostsUpdateCallback,
+  unsubscribeFromFirebase
 } from './storage/index.js';
 import { 
   renderCosts, 
@@ -40,6 +42,7 @@ import {
   exportCostsAsJSON,
   readFile 
 } from './utils/export.js';
+import { isFirebaseEnabled } from './firebase/index.js';
 
 // State
 let currentFilters = {
@@ -67,7 +70,7 @@ const DEFAULT_CATEGORIES = [
  * @param {string} category - Optional category
  * @param {string} date - Optional date (YYYY-MM-DD)
  */
-function handleFormSubmit(person, amount, reason, category, date) {
+async function handleFormSubmit(person, amount, reason, category, date) {
   // Validierung
   if (!validatePerson(person)) {
     showError('Bitte geben Sie einen gültigen Namen ein (1-50 Zeichen).');
@@ -88,7 +91,7 @@ function handleFormSubmit(person, amount, reason, category, date) {
   }
 
   // Kosten hinzufügen
-  addCost(person, amount, reason, category, date);
+  await addCost(person, amount, reason, category, date);
   
   // Liste aktualisieren
   updateCostList();
@@ -100,22 +103,23 @@ function handleFormSubmit(person, amount, reason, category, date) {
  * Handle cost deletion
  * @param {number} index - Index of cost to delete
  */
-function handleDeleteCost(index) {
-  const allCosts = loadCosts();
+async function handleDeleteCost(index) {
+  const allCosts = await loadCosts();
   const filteredCosts = applyFilters(allCosts);
   
-  // Find the actual index in the full list
-  const actualIndex = allCosts.findIndex(cost => {
-    return cost.person === filteredCosts[index]?.person &&
-           cost.amount === filteredCosts[index]?.amount &&
-           cost.date === filteredCosts[index]?.date;
-  });
+  // Find the actual cost object
+  const costToDelete = filteredCosts[index];
+  if (!costToDelete) return;
   
-  if (actualIndex !== -1) {
-    deleteCost(actualIndex);
-    updateCostList();
-    updateChart();
+  // Delete by ID (for Firebase) or index (for localStorage)
+  if (isFirebaseEnabled() && costToDelete.id) {
+    await deleteCost(costToDelete.id);
+  } else {
+    await deleteCost(index);
   }
+  
+  updateCostList();
+  updateChart();
 }
 
 /**
@@ -165,8 +169,8 @@ function applyFilters(costs) {
 /**
  * Update the cost list based on current filters
  */
-function updateCostList() {
-  const allCosts = loadCosts();
+async function updateCostList() {
+  const allCosts = await loadCosts();
   const filteredCosts = applyFilters(allCosts);
   
   renderCosts(filteredCosts);
@@ -175,8 +179,8 @@ function updateCostList() {
 /**
  * Update the chart with current data
  */
-function updateChart() {
-  const allCosts = loadCosts();
+async function updateChart() {
+  const allCosts = await loadCosts();
   const filteredCosts = applyFilters(allCosts);
   const totalsByPerson = calculateTotalByPerson(filteredCosts);
   const totalsByCategory = calculateTotalByCategory(filteredCosts);
@@ -232,7 +236,7 @@ function renderChart(totalsByPerson, totalsByCategory) {
         },
         title: {
           display: true,
-          text: 'Ausgaben nach Person',
+          text: isFirebaseEnabled() ? 'Ausgaben nach Person (Firebase)' : 'Ausgaben nach Person',
           font: {
             size: 16
           }
@@ -245,8 +249,8 @@ function renderChart(totalsByPerson, totalsByCategory) {
 /**
  * Handle CSV export
  */
-function handleExportCSV() {
-  const allCosts = loadCosts();
+async function handleExportCSV() {
+  const allCosts = await loadCosts();
   const filteredCosts = applyFilters(allCosts);
   exportCostsAsCSV(filteredCosts);
 }
@@ -254,8 +258,8 @@ function handleExportCSV() {
 /**
  * Handle JSON export
  */
-function handleExportJSON() {
-  const allCosts = loadCosts();
+async function handleExportJSON() {
+  const allCosts = await loadCosts();
   const filteredCosts = applyFilters(allCosts);
   exportCostsAsJSON(filteredCosts);
 }
@@ -273,7 +277,7 @@ async function handleImport(event) {
     const costs = await readFile(file, fileType);
     
     if (costs.length > 0) {
-      importCosts(costs);
+      await importCosts(costs);
       updateCostList();
       updateChart();
       updateCategoryFilterOptions();
@@ -292,9 +296,9 @@ async function handleImport(event) {
 /**
  * Handle clear all costs
  */
-function handleClearAll() {
+async function handleClearAll() {
   if (confirm('Möchtest du wirklich alle Kosten löschen?')) {
-    clearAllCosts();
+    await clearAllCosts();
     updateCostList();
     updateChart();
   }
@@ -303,16 +307,17 @@ function handleClearAll() {
 /**
  * Initialize the application
  */
-function init() {
+async function init() {
   // Storage initialisieren
-  initializeStorage();
-
-  // DOM-Elemente für Kategorien und Datum hinzufügen
-  addCategoryAndDateElements();
+  initializeStorage((costs) => {
+    // Callback für Echtzeit-Updates
+    updateCostList();
+    updateChart();
+    updateCategoryFilterOptions();
+  });
 
   // Kosten laden und anzeigen
-  const costs = loadCosts();
-  renderCosts(costs);
+  await updateCostList();
   
   // Kategorien-Filter aktualisieren
   updateCategoryFilterOptions();
@@ -339,94 +344,13 @@ function init() {
   initExportImportButtons();
   
   // Chart initialisieren
-  updateChart();
-}
-
-/**
- * Add category and date elements to DOM
- */
-function addCategoryAndDateElements() {
-  // Kategorie-Input zum Formular hinzufügen (falls nicht vorhanden)
-  if (!document.getElementById('category')) {
-    const form = document.getElementById('costForm');
-    if (form) {
-      const categoryGroup = document.createElement('div');
-      categoryGroup.className = 'form-group';
-      categoryGroup.innerHTML = `
-        <select id="category" aria-label="Kategorie">
-          <option value="">Keine Kategorie</option>
-          <option value="Lebensmittel">Lebensmittel</option>
-          <option value="Haushalt">Haushalt</option>
-          <option value="Miete">Miete</option>
-          <option value="Strom">Strom</option>
-          <option value="Internet">Internet</option>
-          <option value="Sonstiges">Sonstiges</option>
-        </select>
-      `;
-      form.insertBefore(categoryGroup, form.lastElementChild);
-    }
-  }
+  await updateChart();
   
-  // Datum-Input zum Formular hinzufügen (falls nicht vorhanden)
-  if (!document.getElementById('date')) {
-    const form = document.getElementById('costForm');
-    if (form) {
-      const dateGroup = document.createElement('div');
-      dateGroup.className = 'form-group';
-      dateGroup.innerHTML = `
-        <input type="date" id="date" aria-label="Datum" value="${getCurrentDate()}">
-      `;
-      form.insertBefore(dateGroup, form.lastElementChild);
-    }
-  }
-  
-  // Datums-Filter hinzufügen (falls nicht vorhanden)
-  if (!document.getElementById('dateFilter')) {
-    const filterGroup = document.querySelector('.filter-group');
-    if (filterGroup) {
-      const dateFilterHTML = `
-        <span style="margin: 0 10px;">|</span>
-        <label for="dateFilter">Zeitraum:</label>
-        <select id="dateFilter" aria-label="Zeitraum filtern">
-          <option value="">Alle Daten</option>
-        </select>
-        <div id="customDateContainer" style="display: none; margin-top: 10px; gap: 10px; flex-wrap: wrap;">
-          <input type="date" id="customDateStart" aria-label="Startdatum">
-          <span>bis</span>
-          <input type="date" id="customDateEnd" aria-label="Enddatum">
-          <button id="applyCustomDate" class="btn btn-secondary" style="margin-left: 10px;">Anwenden</button>
-        </div>
-      `;
-      filterGroup.insertAdjacentHTML('beforeend', dateFilterHTML);
-    }
-  }
-  
-  // Export/Import Buttons hinzufügen (falls nicht vorhanden)
-  if (!document.getElementById('exportCSV')) {
-    const summary = document.getElementById('summary');
-    if (summary) {
-      const exportGroup = document.createElement('div');
-      exportGroup.className = 'export-group';
-      exportGroup.innerHTML = `
-        <button id="exportCSV" class="btn btn-secondary">Export (CSV)</button>
-        <button id="exportJSON" class="btn btn-secondary">Export (JSON)</button>
-        <input type="file" id="importFile" accept=".csv,.json" style="display: none;">
-        <button id="importBtn" class="btn btn-secondary">Import</button>
-        <button id="clearAll" class="btn btn-danger">Alle löschen</button>
-      `;
-      summary.after(exportGroup);
-    }
-  }
-  
-  // Chart Container hinzufügen (falls nicht vorhanden)
-  if (!document.getElementById('costChart')) {
-    const costList = document.getElementById('costList');
-    if (costList) {
-      const chartContainer = document.createElement('div');
-      chartContainer.className = 'chart-container';
-      chartContainer.innerHTML = '<canvas id="costChart"></canvas>';
-      costList.after(chartContainer);
-    }
+  // Status anzeigen
+  if (isFirebaseEnabled()) {
+    console.log('✅ Firebase ist aktiviert - Daten werden synchronisiert');
+  } else {
+    console.log('ℹ️ Firebase ist deaktiviert - Nutze localStorage');
   }
 }
 
@@ -460,3 +384,8 @@ function initExportImportButtons() {
 
 // beim Laden der Seite ausführen
 document.addEventListener('DOMContentLoaded', init);
+
+// Cleanup beim Verlassen der Seite
+window.addEventListener('beforeunload', () => {
+  unsubscribeFromFirebase();
+});

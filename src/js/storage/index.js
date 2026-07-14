@@ -1,6 +1,17 @@
 /**
- * Storage functions for managing costs in localStorage
+ * Storage functions for managing costs
+ * Supports both Firebase and localStorage (fallback)
  */
+
+import {
+  initializeFirebase,
+  onCostsLoaded,
+  loadCostsFromFirebase,
+  saveCostToFirebase,
+  updateCostInFirebase,
+  deleteCostFromFirebase,
+  isFirebaseEnabled
+} from '../firebase/index.js';
 
 const STORAGE_KEY = 'haushaltskosten';
 
@@ -11,7 +22,12 @@ const STORAGE_KEY = 'haushaltskosten';
  * @property {string} [reason] - Optional: Grund für die Ausgabe
  * @property {string} [category] - Optional: Kategorie
  * @property {string} [date] - Optional: Datum (YYYY-MM-DD)
+ * @property {string} [id] - Optional: Firebase-ID
  */
+
+// State for Firebase listener
+let firebaseUnsubscribe = null;
+let costsCallback = null;
 
 /**
  * Get current date as YYYY-MM-DD string
@@ -37,10 +53,42 @@ export function formatDate(date) {
 }
 
 /**
+ * Initialize storage (Firebase or localStorage)
+ * @param {Function} [onUpdate] - Callback for realtime updates
+ */
+export function initializeStorage(onUpdate = null) {
+  // Firebase initialisieren
+  const firebaseInitialized = initializeFirebase();
+  
+  // Falls Firebase aktiviert ist und ein Callback übergeben wurde
+  if (firebaseInitialized && onUpdate) {
+    costsCallback = onUpdate;
+    firebaseUnsubscribe = onCostsLoaded((costs) => {
+      // Speichere auch lokal als Fallback
+      saveCostsToLocalStorage(costs);
+      if (costsCallback) {
+        costsCallback(costs);
+      }
+    });
+  }
+  
+  // Falls kein Firebase oder kein Callback, lade aus localStorage
+  if (!firebaseInitialized) {
+    const costs = loadCostsFromLocalStorage();
+    if (costs.length === 0) {
+      saveCostsToLocalStorage([
+        { person: 'Max', amount: 50.00, reason: 'Einkaufen', category: 'Lebensmittel', date: getCurrentDate() },
+        { person: 'Anna', amount: 30.00, reason: 'Strom', category: 'Haushalt', date: getCurrentDate() }
+      ]);
+    }
+  }
+}
+
+/**
  * Load costs from localStorage
  * @returns {Cost[]} Array of cost entries
  */
-export function loadCosts() {
+function loadCostsFromLocalStorage() {
   try {
     const savedCosts = localStorage.getItem(STORAGE_KEY);
     if (!savedCosts) return [];
@@ -54,7 +102,7 @@ export function loadCosts() {
       date: cost.date || getCurrentDate()
     }));
   } catch (e) {
-    console.error('Fehler beim Laden der Kosten:', e);
+    console.error('Fehler beim Laden aus localStorage:', e);
     return [];
   }
 }
@@ -63,8 +111,49 @@ export function loadCosts() {
  * Save costs to localStorage
  * @param {Cost[]} costs - Array of cost entries to save
  */
-export function saveCosts(costs) {
+function saveCostsToLocalStorage(costs) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(costs));
+}
+
+/**
+ * Load costs from the appropriate source
+ * @returns {Promise<Cost[]>} Promise with costs array
+ */
+export async function loadCosts() {
+  if (isFirebaseEnabled()) {
+    try {
+      const costs = await loadCostsFromFirebase();
+      // Speichere auch lokal als Fallback
+      if (costs.length > 0) {
+        saveCostsToLocalStorage(costs);
+      }
+      return costs;
+    } catch (error) {
+      console.error('Firebase-Laden fehlgeschlagen, nutze localStorage:', error);
+      return loadCostsFromLocalStorage();
+    }
+  }
+  
+  return loadCostsFromLocalStorage();
+}
+
+/**
+ * Save costs to the appropriate source
+ * @param {Cost[]} costs - Array of cost entries to save
+ */
+export function saveCosts(costs) {
+  saveCostsToLocalStorage(costs);
+  
+  if (isFirebaseEnabled()) {
+    // Für Firebase speichern wir jeden Eintrag einzeln
+    costs.forEach(async (cost) => {
+      if (cost.id) {
+        await updateCostInFirebase(cost.id, cost);
+      } else {
+        await saveCostToFirebase(cost);
+      }
+    });
+  }
 }
 
 /**
@@ -75,27 +164,50 @@ export function saveCosts(costs) {
  * @param {string} [category] - Optional category
  * @param {string} [date] - Optional date (YYYY-MM-DD)
  */
-export function addCost(person, amount, reason = '', category = '', date = '') {
-  const costs = loadCosts();
-  costs.push({ 
+export async function addCost(person, amount, reason = '', category = '', date = '') {
+  const cost = { 
     person, 
     amount: parseFloat(amount), 
     reason: reason || undefined,
     category: category || undefined,
     date: date || getCurrentDate()
-  });
-  saveCosts(costs);
+  };
+  
+  if (isFirebaseEnabled()) {
+    try {
+      const id = await saveCostToFirebase(cost);
+      cost.id = id;
+    } catch (error) {
+      console.error('Firebase-Speichern fehlgeschlagen, nutze localStorage:', error);
+    }
+  }
+  
+  // Immer lokal speichern als Fallback
+  const costs = loadCostsFromLocalStorage();
+  costs.push(cost);
+  saveCostsToLocalStorage(costs);
 }
 
 /**
- * Delete a cost entry by index
- * @param {number} index - Index of the cost entry to delete
+ * Delete a cost entry by index or ID
+ * @param {number|string} identifier - Index (for localStorage) or ID (for Firebase)
  */
-export function deleteCost(index) {
-  const costs = loadCosts();
+export async function deleteCost(identifier) {
+  if (isFirebaseEnabled() && typeof identifier === 'string') {
+    try {
+      await deleteCostFromFirebase(identifier);
+    } catch (error) {
+      console.error('Firebase-Löschen fehlgeschlagen:', error);
+    }
+  }
+  
+  // Lokales Löschen
+  const costs = loadCostsFromLocalStorage();
+  const index = typeof identifier === 'number' ? identifier : costs.findIndex(c => c.id === identifier);
+  
   if (index >= 0 && index < costs.length) {
     costs.splice(index, 1);
-    saveCosts(costs);
+    saveCostsToLocalStorage(costs);
   }
 }
 
@@ -105,7 +217,7 @@ export function deleteCost(index) {
  * @returns {number} Total amount
  */
 export function calculateTotal(costs = null) {
-  const costsToUse = costs || loadCosts();
+  const costsToUse = costs || loadCostsFromLocalStorage();
   return costsToUse.reduce((total, cost) => total + (cost.amount || 0), 0);
 }
 
@@ -115,7 +227,7 @@ export function calculateTotal(costs = null) {
  * @returns {Object.<string, number>} Totals by category
  */
 export function calculateTotalByCategory(costs = null) {
-  const costsToUse = costs || loadCosts();
+  const costsToUse = costs || loadCostsFromLocalStorage();
   const totals = {};
   
   costsToUse.forEach(cost => {
@@ -132,7 +244,7 @@ export function calculateTotalByCategory(costs = null) {
  * @returns {Object.<string, number>} Totals by person
  */
 export function calculateTotalByPerson(costs = null) {
-  const costsToUse = costs || loadCosts();
+  const costsToUse = costs || loadCostsFromLocalStorage();
   const totals = {};
   
   costsToUse.forEach(cost => {
@@ -148,7 +260,7 @@ export function calculateTotalByPerson(costs = null) {
  * @returns {Cost[]} Filtered costs
  */
 export function filterCostsByCategory(category = '') {
-  const costs = loadCosts();
+  const costs = loadCostsFromLocalStorage();
   if (!category) return costs;
   return costs.filter(cost => cost.category === category);
 }
@@ -161,7 +273,7 @@ export function filterCostsByCategory(category = '') {
  * @returns {Cost[]} Filtered costs
  */
 export function filterCostsByDate(dateFilter = '', startDate = '', endDate = '') {
-  const costs = loadCosts();
+  const costs = loadCostsFromLocalStorage();
   const today = new Date();
   
   if (!dateFilter) return costs;
@@ -207,7 +319,7 @@ export function filterCostsByDate(dateFilter = '', startDate = '', endDate = '')
  * @returns {string[]} Array of unique categories
  */
 export function getAllCategories() {
-  const costs = loadCosts();
+  const costs = loadCostsFromLocalStorage();
   const categories = new Set();
   
   costs.forEach(cost => {
@@ -224,7 +336,7 @@ export function getAllCategories() {
  * @returns {string[]} Array of unique dates (YYYY-MM-DD)
  */
 export function getAllDates() {
-  const costs = loadCosts();
+  const costs = loadCostsFromLocalStorage();
   const dates = new Set();
   
   costs.forEach(cost => {
@@ -237,44 +349,69 @@ export function getAllDates() {
 }
 
 /**
- * Get date range for custom filter
- * @param {string} startDate - Start date (YYYY-MM-DD)
- * @param {string} endDate - End date (YYYY-MM-DD)
- * @returns {Object} Object with start and end dates
- */
-export function getDateRange(startDate, endDate) {
-  return { startDate, endDate };
-}
-
-/**
- * Initialize storage with default costs if empty
- */
-export function initializeStorage() {
-  const costs = loadCosts();
-  if (costs.length === 0) {
-    saveCosts([
-      { person: 'Max', amount: 50.00, reason: 'Einkaufen', category: 'Lebensmittel', date: getCurrentDate() },
-      { person: 'Anna', amount: 30.00, reason: 'Strom', category: 'Haushalt', date: getCurrentDate() }
-    ]);
-  }
-}
-
-/**
  * Clear all costs
  */
 export function clearAllCosts() {
-  saveCosts([]);
+  saveCostsToLocalStorage([]);
+  
+  if (isFirebaseEnabled()) {
+    // Lösche alle Einträge in Firebase
+    // Hinweis: Firebase hat keine einfache "delete all" Methode
+    // Wir löschen jeden Eintrag einzeln
+    loadCostsFromFirebase().then(costs => {
+      costs.forEach(async cost => {
+        if (cost.id) {
+          await deleteCostFromFirebase(cost.id);
+        }
+      });
+    });
+  }
 }
 
 /**
  * Import costs from external source
  * @param {Cost[]} newCosts - Costs to import
  */
-export function importCosts(newCosts) {
-  const existingCosts = loadCosts();
+export async function importCosts(newCosts) {
+  const existingCosts = loadCostsFromLocalStorage();
   const mergedCosts = [...existingCosts, ...newCosts.map(cost => ({
     ...cost,
     date: cost.date || getCurrentDate()
   }))];
-  saveCosts(mergedCosts);
+  
+  saveCostsToLocalStorage(mergedCosts);
+  
+  if (isFirebaseEnabled()) {
+    // Speichere alle in Firebase
+    for (const cost of newCosts) {
+      await saveCostToFirebase(cost);
+    }
+  }
+}
+
+/**
+ * Unsubscribe from Firebase listener
+ */
+export function unsubscribeFromFirebase() {
+  if (firebaseUnsubscribe) {
+    firebaseUnsubscribe();
+    firebaseUnsubscribe = null;
+  }
+}
+
+/**
+ * Set callback for realtime updates
+ * @param {Function} callback - Callback function
+ */
+export function setCostsUpdateCallback(callback) {
+  costsCallback = callback;
+  
+  if (isFirebaseEnabled() && !firebaseUnsubscribe) {
+    firebaseUnsubscribe = onCostsLoaded((costs) => {
+      saveCostsToLocalStorage(costs);
+      if (costsCallback) {
+        costsCallback(costs);
+      }
+    });
+  }
 }

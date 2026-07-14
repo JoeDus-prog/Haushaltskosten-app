@@ -1,7 +1,7 @@
 {
   "name": "haushaltskosten-app",
   "version": "1.0.0",
-  "description": "Eine einfache Web-App zur Verwaltung von Haushaltskosten",
+  "description": "Eine einfache Web-App zur Verwaltung von Haushaltskosten mit Firebase-Integration",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -18,7 +18,8 @@
     "haushalt",
     "kosten",
     "budget",
-    "expenses"
+    "expenses",
+    "firebase"
   ],
   "author": "JoeDus-prog",
   "license": "MIT",
