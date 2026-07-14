@@ -5,5 +5,11 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     include: ['src/**/*.{test,spec}.js'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+      include: ['src/js/**/*.js'],
+      exclude: ['src/js/**/*.test.js', 'src/js/**/*.spec.js']
+    }
   },
 });
