@@ -13,6 +13,8 @@
   <meta name="twitter:card" content="summary">
   <title>Haushaltskosten-App</title>
   <link rel="stylesheet" href="src/css/styles.css">
+  <!-- Chart.js CDN for visualizations -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
   <button class="theme-toggle" id="themeToggle" aria-label="Theme umschalten">🌍</button>
@@ -30,6 +32,17 @@
       <div class="form-group">
         <input type="text" id="reason" placeholder="Grund (z. B. Einkaufen)" aria-label="Grund für die Ausgabe">
       </div>
+      <div class="form-group">
+        <select id="category" aria-label="Kategorie">
+          <option value="">Keine Kategorie</option>
+          <option value="Lebensmittel">Lebensmittel</option>
+          <option value="Haushalt">Haushalt</option>
+          <option value="Miete">Miete</option>
+          <option value="Strom">Strom</option>
+          <option value="Internet">Internet</option>
+          <option value="Sonstiges">Sonstiges</option>
+        </select>
+      </div>
       <button type="submit" class="btn" aria-label="Kosteneintrag hinzufügen">Hinzufügen</button>
     </form>
 
@@ -37,8 +50,31 @@
       <p>Gesamt: <span id="totalAmount">0€</span></p>
     </div>
 
+    <!-- Export/Import Buttons -->
+    <div class="export-group">
+      <button id="exportCSV" class="btn btn-secondary">Export (CSV)</button>
+      <button id="exportJSON" class="btn btn-secondary">Export (JSON)</button>
+      <input type="file" id="importFile" accept=".csv,.json" style="display: none;">
+      <button id="importBtn" class="btn btn-secondary">Import</button>
+      <button id="clearAll" class="btn btn-danger">Alle löschen</button>
+    </div>
+
+    <!-- Category Filter -->
+    <div class="filter-group">
+      <label for="categoryFilter">Filter nach Kategorie:</label>
+      <select id="categoryFilter" aria-label="Kategorie filtern">
+        <option value="">Alle Kategorien</option>
+      </select>
+    </div>
+
+    <!-- Cost List -->
     <div id="costList" class="cost-list" role="list" aria-label="Liste der Haushaltskosten">
       <!-- Kosten werden dynamisch eingefügt -->
+    </div>
+
+    <!-- Chart Container -->
+    <div class="chart-container">
+      <canvas id="costChart"></canvas>
     </div>
   </div>
 

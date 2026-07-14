@@ -5,8 +5,16 @@
 const STORAGE_KEY = 'haushaltskosten';
 
 /**
+ * @typedef {Object} Cost
+ * @property {string} person - Name der Person
+ * @property {number} amount - Betrag (als Number)
+ * @property {string} [reason] - Optional: Grund für die Ausgabe
+ * @property {string} [category] - Optional: Kategorie
+ */
+
+/**
  * Load costs from localStorage
- * @returns {Array<{person: string, amount: number, reason: string}>} Array of cost entries
+ * @returns {Cost[]} Array of cost entries
  */
 export function loadCosts() {
   try {
@@ -28,7 +36,7 @@ export function loadCosts() {
 
 /**
  * Save costs to localStorage
- * @param {Array<{person: string, amount: number, reason: string}>} costs - Array of cost entries to save
+ * @param {Cost[]} costs - Array of cost entries to save
  */
 export function saveCosts(costs) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(costs));
@@ -37,12 +45,18 @@ export function saveCosts(costs) {
 /**
  * Add a new cost entry
  * @param {string} person - Person name
- * @param {number} amount - Amount
+ * @param {number|string} amount - Amount
  * @param {string} [reason] - Optional reason
+ * @param {string} [category] - Optional category
  */
-export function addCost(person, amount, reason = '') {
+export function addCost(person, amount, reason = '', category = '') {
   const costs = loadCosts();
-  costs.push({ person, amount: parseFloat(amount), reason });
+  costs.push({ 
+    person, 
+    amount: parseFloat(amount), 
+    reason: reason || undefined,
+    category: category || undefined
+  });
   saveCosts(costs);
 }
 
@@ -60,12 +74,73 @@ export function deleteCost(index) {
 
 /**
  * Calculate total amount of all costs
- * @param {Array<{person: string, amount: number, reason: string}>} [costs] - Optional array of costs (defaults to loaded costs)
+ * @param {Cost[]} [costs] - Optional array of costs (defaults to loaded costs)
  * @returns {number} Total amount
  */
 export function calculateTotal(costs = null) {
   const costsToUse = costs || loadCosts();
   return costsToUse.reduce((total, cost) => total + (cost.amount || 0), 0);
+}
+
+/**
+ * Calculate total by category
+ * @param {Cost[]} [costs] - Optional array of costs
+ * @returns {Object.<string, number>} Totals by category
+ */
+export function calculateTotalByCategory(costs = null) {
+  const costsToUse = costs || loadCosts();
+  const totals = {};
+  
+  costsToUse.forEach(cost => {
+    const category = cost.category || 'Ohne Kategorie';
+    totals[category] = (totals[category] || 0) + (cost.amount || 0);
+  });
+  
+  return totals;
+}
+
+/**
+ * Calculate total by person
+ * @param {Cost[]} [costs] - Optional array of costs
+ * @returns {Object.<string, number>} Totals by person
+ */
+export function calculateTotalByPerson(costs = null) {
+  const costsToUse = costs || loadCosts();
+  const totals = {};
+  
+  costsToUse.forEach(cost => {
+    totals[cost.person] = (totals[cost.person] || 0) + (cost.amount || 0);
+  });
+  
+  return totals;
+}
+
+/**
+ * Filter costs by category
+ * @param {string} [category] - Category to filter by (empty = all)
+ * @returns {Cost[]} Filtered costs
+ */
+export function filterCostsByCategory(category = '') {
+  const costs = loadCosts();
+  if (!category) return costs;
+  return costs.filter(cost => cost.category === category);
+}
+
+/**
+ * Get all unique categories
+ * @returns {string[]} Array of unique categories
+ */
+export function getAllCategories() {
+  const costs = loadCosts();
+  const categories = new Set();
+  
+  costs.forEach(cost => {
+    if (cost.category) {
+      categories.add(cost.category);
+    }
+  });
+  
+  return Array.from(categories).sort();
 }
 
 /**
@@ -75,8 +150,25 @@ export function initializeStorage() {
   const costs = loadCosts();
   if (costs.length === 0) {
     saveCosts([
-      { person: 'Max', amount: 50.00, reason: 'Einkaufen' },
-      { person: 'Anna', amount: 30.00, reason: 'Strom' }
+      { person: 'Max', amount: 50.00, reason: 'Einkaufen', category: 'Lebensmittel' },
+      { person: 'Anna', amount: 30.00, reason: 'Strom', category: 'Haushalt' }
     ]);
   }
+}
+
+/**
+ * Clear all costs
+ */
+export function clearAllCosts() {
+  saveCosts([]);
+}
+
+/**
+ * Import costs from external source
+ * @param {Cost[]} newCosts - Costs to import
+ */
+export function importCosts(newCosts) {
+  const existingCosts = loadCosts();
+  const mergedCosts = [...existingCosts, ...newCosts];
+  saveCosts(mergedCosts);
 }
