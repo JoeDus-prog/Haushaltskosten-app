@@ -2,8 +2,8 @@
  * Utility functions for exporting and importing cost data
  */
 
-import { sanitizeInput, formatCurrency } from './sanitize.js';
-import { formatDate } from '../storage/index.js';
+import { sanitizeInput, formatCurrency } from "./sanitize.js";
+import { formatDate } from "../storage/index.js";
 
 /**
  * Export costs to CSV format
@@ -11,20 +11,20 @@ import { formatDate } from '../storage/index.js';
  * @returns {string} CSV formatted string
  */
 export function exportToCSV(costs) {
-  const headers = ['Datum', 'Person', 'Betrag (€)', 'Grund', 'Kategorie'];
+  const headers = ["Datum", "Person", "Betrag (€)", "Grund", "Kategorie"];
   
   const rows = costs.map(cost => [
-    cost.date ? formatDate(cost.date) : '',
+    cost.date ? formatDate(cost.date) : "",
     cost.person,
     cost.amount.toFixed(2),
-    cost.reason || '',
-    cost.category || ''
+    cost.reason || "",
+    cost.category || ""
   ]);
   
   const csvContent = [
-    headers.join(';'),
-    ...rows.map(row => row.map(field => `"${String(field).replace(/"/g, '""')}"`).join(';'))
-  ].join('\n');
+    headers.join(";"),
+    ...rows.map(row => row.map(field => `"${String(field).replace(/"/g, "\"\"")}"`).join(";"))
+  ].join("\n");
   
   return csvContent;
 }
@@ -47,7 +47,7 @@ export function exportToJSON(costs) {
 export function downloadFile(content, filename, mimeType) {
   const blob = new Blob([content], { type: mimeType });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
+  const a = document.createElement("a");
   a.href = url;
   a.download = filename;
   document.body.appendChild(a);
@@ -62,7 +62,7 @@ export function downloadFile(content, filename, mimeType) {
  */
 export function exportCostsAsCSV(costs) {
   const csv = exportToCSV(costs);
-  downloadFile(csv, `haushaltskosten_${formatDate(new Date().toISOString().split('T')[0])}.csv`, 'text/csv;charset=utf-8;');
+  downloadFile(csv, `haushaltskosten_${formatDate(new Date().toISOString().split("T")[0])}.csv`, "text/csv;charset=utf-8;");
 }
 
 /**
@@ -71,7 +71,7 @@ export function exportCostsAsCSV(costs) {
  */
 export function exportCostsAsJSON(costs) {
   const json = exportToJSON(costs);
-  downloadFile(json, `haushaltskosten_${formatDate(new Date().toISOString().split('T')[0])}.json`, 'application/json;charset=utf-8;');
+  downloadFile(json, `haushaltskosten_${formatDate(new Date().toISOString().split("T")[0])}.json`, "application/json;charset=utf-8;");
 }
 
 /**
@@ -80,7 +80,7 @@ export function exportCostsAsJSON(costs) {
  * @returns {string} Date in YYYY-MM-DD format
  */
 export function parseDate(dateStr) {
-  if (!dateStr) return '';
+  if (!dateStr) return "";
   
   // Try YYYY-MM-DD format
   if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
@@ -88,15 +88,15 @@ export function parseDate(dateStr) {
   }
   
   // Try DD.MM.YYYY format
-  const parts = dateStr.split('.');
+  const parts = dateStr.split(".");
   if (parts.length === 3) {
-    const day = parts[0].padStart(2, '0');
-    const month = parts[1].padStart(2, '0');
+    const day = parts[0].padStart(2, "0");
+    const month = parts[1].padStart(2, "0");
     const year = parts[2];
     return `${year}-${month}-${day}`;
   }
   
-  return '';
+  return "";
 }
 
 /**
@@ -105,32 +105,32 @@ export function parseDate(dateStr) {
  * @returns {Array<{person: string, amount: number, reason: string, category?: string, date?: string}>} Array of cost entries
  */
 export function parseCSV(csvContent) {
-  const lines = csvContent.split('\n').filter(line => line.trim() !== '');
+  const lines = csvContent.split("\n").filter(line => line.trim() !== "");
   if (lines.length < 2) return [];
   
   // Skip header if present
-  const hasHeader = lines[0].toLowerCase().includes('person') || 
-                   lines[0].toLowerCase().includes('betrag') ||
-                   lines[0].toLowerCase().includes('datum');
+  const hasHeader = lines[0].toLowerCase().includes("person") || 
+                   lines[0].toLowerCase().includes("betrag") ||
+                   lines[0].toLowerCase().includes("datum");
   const startIndex = hasHeader ? 1 : 0;
   
   return lines.slice(startIndex).map(line => {
-    const values = line.split(';').map(v => v.trim().replace(/^"|"$/g, '').replace(/""/g, '"'));
+    const values = line.split(";").map(v => v.trim().replace(/^"|"$/g, "").replace(/""/g, "\""));
     
     // Handle different CSV formats (with or without date)
-    let date = '';
-    let person = values[0] || '';
+    let date = "";
+    let person = values[0] || "";
     let amount = parseFloat(values[1]) || 0;
-    let reason = values[2] || '';
-    let category = values[3] || '';
+    let reason = values[2] || "";
+    let category = values[3] || "";
     
     // If first value looks like a date (YYYY-MM-DD or DD.MM.YYYY)
     if (/^\d{4}-\d{2}-\d{2}$/.test(values[0]) || /^\d{1,2}\.\d{1,2}\.\d{4}$/.test(values[0])) {
       date = parseDate(values[0]);
-      person = values[1] || '';
+      person = values[1] || "";
       amount = parseFloat(values[2]) || 0;
-      reason = values[3] || '';
-      category = values[4] || '';
+      reason = values[3] || "";
+      category = values[4] || "";
     }
     
     // If amount is in first column (wrong order)
@@ -159,14 +159,14 @@ export function parseJSON(jsonContent) {
     if (!Array.isArray(parsed)) return [];
     
     return parsed.map(cost => ({
-      person: sanitizeInput(cost.person || ''),
-      amount: typeof cost.amount === 'number' ? cost.amount : parseFloat(cost.amount) || 0,
-      reason: sanitizeInput(cost.reason || ''),
-      category: sanitizeInput(cost.category || '') || undefined,
+      person: sanitizeInput(cost.person || ""),
+      amount: typeof cost.amount === "number" ? cost.amount : parseFloat(cost.amount) || 0,
+      reason: sanitizeInput(cost.reason || ""),
+      category: sanitizeInput(cost.category || "") || undefined,
       date: cost.date ? String(cost.date) : undefined
     })).filter(cost => cost.person);
   } catch (e) {
-    console.error('Fehler beim Parsen von JSON:', e);
+    console.error("Fehler beim Parsen von JSON:", e);
     return [];
   }
 }
@@ -184,12 +184,12 @@ export function readFile(file, type) {
     reader.onload = (e) => {
       try {
         const content = e.target.result;
-        if (type === 'csv') {
+        if (type === "csv") {
           resolve(parseCSV(content));
-        } else if (type === 'json') {
+        } else if (type === "json") {
           resolve(parseJSON(content));
         } else {
-          reject(new Error('Unsupported file type'));
+          reject(new Error("Unsupported file type"));
         }
       } catch (error) {
         reject(error);
@@ -197,9 +197,9 @@ export function readFile(file, type) {
     };
     
     reader.onerror = () => {
-      reject(new Error('Fehler beim Lesen der Datei'));
+      reject(new Error("Fehler beim Lesen der Datei"));
     };
     
-    reader.readAsText(file, 'UTF-8');
+    reader.readAsText(file, "UTF-8");
   });
 }

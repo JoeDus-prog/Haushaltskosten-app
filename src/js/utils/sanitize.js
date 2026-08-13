@@ -8,7 +8,7 @@
  * @returns {string} Sanitized input
  */
 export function sanitizeInput(input) {
-  if (!input) return '';
+  if (!input) return "";
   return input
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")

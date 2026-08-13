@@ -11,9 +11,9 @@ import {
   updateCostInFirebase,
   deleteCostFromFirebase,
   isFirebaseEnabled
-} from '../firebase/index.js';
+} from "../firebase/index.js";
 
-const STORAGE_KEY = 'haushaltskosten';
+const STORAGE_KEY = "haushaltskosten";
 
 /**
  * @typedef {Object} Cost
@@ -36,8 +36,8 @@ let costsCallback = null;
 export function getCurrentDate() {
   const today = new Date();
   const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, '0');
-  const day = String(today.getDate()).padStart(2, '0');
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 }
 
@@ -47,8 +47,8 @@ export function getCurrentDate() {
  * @returns {string} Formatted date
  */
 export function formatDate(date) {
-  if (!date) return '';
-  const [year, month, day] = date.split('-');
+  if (!date) return "";
+  const [year, month, day] = date.split("-");
   return `${day}.${month}.${year}`;
 }
 
@@ -77,8 +77,8 @@ export function initializeStorage(onUpdate = null) {
     const costs = loadCostsFromLocalStorage();
     if (costs.length === 0) {
       saveCostsToLocalStorage([
-        { person: 'Max', amount: 50.00, reason: 'Einkaufen', category: 'Lebensmittel', date: getCurrentDate() },
-        { person: 'Anna', amount: 30.00, reason: 'Strom', category: 'Haushalt', date: getCurrentDate() }
+        { person: "Max", amount: 50.00, reason: "Einkaufen", category: "Lebensmittel", date: getCurrentDate() },
+        { person: "Anna", amount: 30.00, reason: "Strom", category: "Haushalt", date: getCurrentDate() }
       ]);
     }
   }
@@ -98,11 +98,11 @@ function loadCostsFromLocalStorage() {
     // Normalize amounts to numbers and add default date if missing
     return parsed.map(cost => ({
       ...cost,
-      amount: typeof cost.amount === 'number' ? cost.amount : parseFloat(cost.amount) || 0,
+      amount: typeof cost.amount === "number" ? cost.amount : parseFloat(cost.amount) || 0,
       date: cost.date || getCurrentDate()
     }));
   } catch (e) {
-    console.error('Fehler beim Laden aus localStorage:', e);
+    console.error("Fehler beim Laden aus localStorage:", e);
     return [];
   }
 }
@@ -129,7 +129,7 @@ export async function loadCosts() {
       }
       return costs;
     } catch (error) {
-      console.error('Firebase-Laden fehlgeschlagen, nutze localStorage:', error);
+      console.error("Firebase-Laden fehlgeschlagen, nutze localStorage:", error);
       return loadCostsFromLocalStorage();
     }
   }
@@ -164,7 +164,7 @@ export function saveCosts(costs) {
  * @param {string} [category] - Optional category
  * @param {string} [date] - Optional date (YYYY-MM-DD)
  */
-export async function addCost(person, amount, reason = '', category = '', date = '') {
+export async function addCost(person, amount, reason = "", category = "", date = "") {
   const cost = { 
     person, 
     amount: parseFloat(amount), 
@@ -178,7 +178,7 @@ export async function addCost(person, amount, reason = '', category = '', date =
       const id = await saveCostToFirebase(cost);
       cost.id = id;
     } catch (error) {
-      console.error('Firebase-Speichern fehlgeschlagen, nutze localStorage:', error);
+      console.error("Firebase-Speichern fehlgeschlagen, nutze localStorage:", error);
     }
   }
   
@@ -193,17 +193,17 @@ export async function addCost(person, amount, reason = '', category = '', date =
  * @param {number|string} identifier - Index (for localStorage) or ID (for Firebase)
  */
 export async function deleteCost(identifier) {
-  if (isFirebaseEnabled() && typeof identifier === 'string') {
+  if (isFirebaseEnabled() && typeof identifier === "string") {
     try {
       await deleteCostFromFirebase(identifier);
     } catch (error) {
-      console.error('Firebase-Löschen fehlgeschlagen:', error);
+      console.error("Firebase-Löschen fehlgeschlagen:", error);
     }
   }
   
   // Lokales Löschen
   const costs = loadCostsFromLocalStorage();
-  const index = typeof identifier === 'number' ? identifier : costs.findIndex(c => c.id === identifier);
+  const index = typeof identifier === "number" ? identifier : costs.findIndex(c => c.id === identifier);
   
   if (index >= 0 && index < costs.length) {
     costs.splice(index, 1);
@@ -231,7 +231,7 @@ export function calculateTotalByCategory(costs = null) {
   const totals = {};
   
   costsToUse.forEach(cost => {
-    const category = cost.category || 'Ohne Kategorie';
+    const category = cost.category || "Ohne Kategorie";
     totals[category] = (totals[category] || 0) + (cost.amount || 0);
   });
   
@@ -259,7 +259,7 @@ export function calculateTotalByPerson(costs = null) {
  * @param {string} [category] - Category to filter by (empty = all)
  * @returns {Cost[]} Filtered costs
  */
-export function filterCostsByCategory(category = '') {
+export function filterCostsByCategory(category = "") {
   const costs = loadCostsFromLocalStorage();
   if (!category) return costs;
   return costs.filter(cost => cost.category === category);
@@ -272,7 +272,7 @@ export function filterCostsByCategory(category = '') {
  * @param {string} [endDate] - End date for custom range (YYYY-MM-DD)
  * @returns {Cost[]} Filtered costs
  */
-export function filterCostsByDate(dateFilter = '', startDate = '', endDate = '') {
+export function filterCostsByDate(dateFilter = "", startDate = "", endDate = "") {
   const costs = loadCostsFromLocalStorage();
   const today = new Date();
   
@@ -281,35 +281,39 @@ export function filterCostsByDate(dateFilter = '', startDate = '', endDate = '')
   return costs.filter(cost => {
     if (!cost.date) return true;
     
-    const costDate = new Date(cost.date + 'T00:00:00');
+    const costDate = new Date(cost.date + "T00:00:00");
     
     switch (dateFilter) {
-      case 'today':
-        return costDate.toDateString() === today.toDateString();
+    case "today":
+      return costDate.toDateString() === today.toDateString();
       
-      case 'week':
-        const weekAgo = new Date(today);
-        weekAgo.setDate(today.getDate() - 7);
-        return costDate >= weekAgo && costDate <= today;
+    case "week": {
+      const weekAgo = new Date(today);
+      weekAgo.setDate(today.getDate() - 7);
+      return costDate >= weekAgo && costDate <= today;
+    }
       
-      case 'month':
-        const monthAgo = new Date(today);
-        monthAgo.setMonth(today.getMonth() - 1);
-        return costDate >= monthAgo && costDate <= today;
+    case "month": {
+      const monthAgo = new Date(today);
+      monthAgo.setMonth(today.getMonth() - 1);
+      return costDate >= monthAgo && costDate <= today;
+    }
       
-      case 'year':
-        const yearAgo = new Date(today);
-        yearAgo.setFullYear(today.getFullYear() - 1);
-        return costDate >= yearAgo && costDate <= today;
+    case "year": {
+      const yearAgo = new Date(today);
+      yearAgo.setFullYear(today.getFullYear() - 1);
+      return costDate >= yearAgo && costDate <= today;
+    }
       
-      case 'custom':
-        if (!startDate || !endDate) return true;
-        const start = new Date(startDate + 'T00:00:00');
-        const end = new Date(endDate + 'T23:59:59');
-        return costDate >= start && costDate <= end;
+    case "custom": {
+      if (!startDate || !endDate) return true;
+      const start = new Date(startDate + "T00:00:00");
+      const end = new Date(endDate + "T23:59:59");
+      return costDate >= start && costDate <= end;
+    }
       
-      default:
-        return true;
+    default:
+      return true;
     }
   });
 }
