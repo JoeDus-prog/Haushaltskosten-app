@@ -10,18 +10,19 @@
  * 5. Kopiere die Konfiguration hierher
  */
 
-// Deine Firebase-Konfiguration (wird später durch deine Werte ersetzt)
+// Deine Firebase-Konfiguration
 const firebaseConfig = {
-  apiKey: "DEIN_API_KEY",
-  authDomain: "DEIN_PROJEKT_ID.firebaseapp.com",
-  databaseURL: "https://DEIN_PROJEKT_ID.firebaseio.com",
-  projectId: "DEIN_PROJEKT_ID",
-  storageBucket: "DEIN_PROJEKT_ID.appspot.com",
-  messagingSenderId: "DEINE_SENDER_ID",
-  appId: "DEINE_APP_ID"
+  apiKey: "AIzaSyA4K5veMW86XX3Djw-_yLY0a3dINLUvvts",
+  authDomain: "haushalts-app-94d47.firebaseapp.com",
+  databaseURL: "https://haushalts-app-94d47-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "haushalts-app-94d47",
+  storageBucket: "haushalts-app-94d47.firebasestorage.app",
+  messagingSenderId: "767347589868",
+  appId: "1:767347589868:web:052c52a0121f1a91549bc9",
+  measurementId: "G-GV7XESZJ4R"
 };
 
 // Flag, ob Firebase aktiviert ist (für Entwicklung ohne Firebase)
-const ENABLE_FIREBASE = false; // Auf true setzen, wenn Firebase konfiguriert ist
+const ENABLE_FIREBASE = true; // Auf true setzen, wenn Firebase konfiguriert ist
 
 export { firebaseConfig, ENABLE_FIREBASE };

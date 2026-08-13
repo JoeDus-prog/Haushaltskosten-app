@@ -3,6 +3,7 @@
  */
 
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getAnalytics, isSupported as isAnalyticsSupported } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js';
 import { getDatabase, ref, push, set, onValue, remove, off } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 import { firebaseConfig, ENABLE_FIREBASE } from './config.js';
 
@@ -23,6 +24,18 @@ export function initializeFirebase() {
     const app = initializeApp(firebaseConfig);
     db = getDatabase(app);
     costsRef = ref(db, 'costs');
+
+    // Google Analytics initialisieren (falls unterstützt, z. B. nicht in Node-Tests)
+    isAnalyticsSupported()
+      .then((supported) => {
+        if (supported) {
+          getAnalytics(app);
+        }
+      })
+      .catch((error) => {
+        console.warn('Analytics konnte nicht initialisiert werden:', error);
+      });
+
     console.log('Firebase erfolgreich initialisiert');
     return true;
   } catch (error) {
