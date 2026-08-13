@@ -2,24 +2,24 @@
  * DOM manipulation functions for the cost list
  */
 
-import { sanitizeInput, formatCurrency } from '../utils/index.js';
-import { formatDate } from '../storage/index.js';
+import { sanitizeInput, formatCurrency } from "../utils/index.js";
+import { formatDate } from "../storage/index.js";
 
 // DOM-Elemente cachen
 const elements = {
-  costForm: document.getElementById('costForm'),
-  person: document.getElementById('person'),
-  amount: document.getElementById('amount'),
-  reason: document.getElementById('reason'),
-  category: document.getElementById('category'),
-  date: document.getElementById('date'),
-  costList: document.getElementById('costList'),
-  totalAmount: document.getElementById('totalAmount'),
-  categoryFilter: document.getElementById('categoryFilter'),
-  dateFilter: document.getElementById('dateFilter'),
-  customDateStart: document.getElementById('customDateStart'),
-  customDateEnd: document.getElementById('customDateEnd'),
-  applyCustomDate: document.getElementById('applyCustomDate')
+  costForm: document.getElementById("costForm"),
+  person: document.getElementById("person"),
+  amount: document.getElementById("amount"),
+  reason: document.getElementById("reason"),
+  category: document.getElementById("category"),
+  date: document.getElementById("date"),
+  costList: document.getElementById("costList"),
+  totalAmount: document.getElementById("total-amount"),
+  categoryFilter: document.getElementById("categoryFilter"),
+  dateFilter: document.getElementById("dateFilter"),
+  customDateStart: document.getElementById("customDateStart"),
+  customDateEnd: document.getElementById("customDateEnd"),
+  applyCustomDate: document.getElementById("applyCustomDate")
 };
 
 /**
@@ -29,14 +29,14 @@ const elements = {
 export function renderCosts(costs) {
   // Liste leeren
   if (elements.costList) {
-    elements.costList.innerHTML = '';
+    elements.costList.innerHTML = "";
   }
 
   if (!costs || costs.length === 0) {
     if (elements.costList) {
-      const emptyMessage = document.createElement('div');
-      emptyMessage.className = 'empty-message';
-      emptyMessage.textContent = 'Keine Kosten vorhanden. Füge welche hinzu!';
+      const emptyMessage = document.createElement("div");
+      emptyMessage.className = "empty-message";
+      emptyMessage.textContent = "Keine Kosten vorhanden. Füge welche hinzu!";
       elements.costList.appendChild(emptyMessage);
     }
     return;
@@ -51,18 +51,18 @@ export function renderCosts(costs) {
 
   // Jeden Kosteneintrag hinzufügen
   sortedCosts.forEach((cost, index) => {
-    const li = document.createElement('div');
-    li.setAttribute('role', 'listitem');
+    const li = document.createElement("div");
+    li.setAttribute("role", "listitem");
     li.dataset.index = index;
-    li.dataset.category = cost.category || '';
-    li.dataset.date = cost.date || '';
+    li.dataset.category = cost.category || "";
+    li.dataset.date = cost.date || "";
     li.innerHTML = `
       <div class="cost-info">
-        ${cost.date ? `<span class="cost-date">${formatDate(cost.date)}</span>` : ''}
+        ${cost.date ? `<span class="cost-date">${formatDate(cost.date)}</span>` : ""}
         <span class="cost-person">${sanitizeInput(cost.person)}</span>:
         <span class="cost-amount">${formatCurrency(cost.amount)}</span>
-        ${cost.reason ? `<span class="cost-reason">(${sanitizeInput(cost.reason)})</span>` : ''}
-        ${cost.category ? `<span class="cost-category">[${sanitizeInput(cost.category)}]</span>` : ''}
+        ${cost.reason ? `<span class="cost-reason">(${sanitizeInput(cost.reason)})</span>` : ""}
+        ${cost.category ? `<span class="cost-category">[${sanitizeInput(cost.category)}]</span>` : ""}
       </div>
       <button class="delete-btn" data-index="${index}" aria-label="Eintrag löschen">Löschen</button>
     `;
@@ -88,10 +88,10 @@ export function updateCategoryFilter(categories) {
   // Aktuelle Auswahl speichern
   const currentValue = elements.categoryFilter.value;
   
-  elements.categoryFilter.innerHTML = '<option value="">Alle Kategorien</option>';
+  elements.categoryFilter.innerHTML = "<option value=\"\">Alle Kategorien</option>";
   
   categories.forEach(category => {
-    const option = document.createElement('option');
+    const option = document.createElement("option");
     option.value = category;
     option.textContent = category;
     elements.categoryFilter.appendChild(option);
@@ -110,17 +110,17 @@ export function updateDateFilter() {
   if (!elements.dateFilter) return;
   
   const dateOptions = [
-    { value: '', label: 'Alle Daten' },
-    { value: 'today', label: 'Heute' },
-    { value: 'week', label: 'Letzte 7 Tage' },
-    { value: 'month', label: 'Letzter Monat' },
-    { value: 'year', label: 'Letztes Jahr' },
-    { value: 'custom', label: 'Benutzerdefiniert' }
+    { value: "", label: "Alle Daten" },
+    { value: "today", label: "Heute" },
+    { value: "week", label: "Letzte 7 Tage" },
+    { value: "month", label: "Letzter Monat" },
+    { value: "year", label: "Letztes Jahr" },
+    { value: "custom", label: "Benutzerdefiniert" }
   ];
   
-  elements.dateFilter.innerHTML = '';
+  elements.dateFilter.innerHTML = "";
   dateOptions.forEach(option => {
-    const optElement = document.createElement('option');
+    const optElement = document.createElement("option");
     optElement.value = option.value;
     optElement.textContent = option.label;
     elements.dateFilter.appendChild(optElement);
@@ -132,9 +132,9 @@ export function updateDateFilter() {
  * @param {boolean} show - Whether to show custom date inputs
  */
 export function toggleCustomDateInputs(show) {
-  const customDateContainer = document.getElementById('customDateContainer');
+  const customDateContainer = document.getElementById("customDateContainer");
   if (customDateContainer) {
-    customDateContainer.style.display = show ? 'flex' : 'none';
+    customDateContainer.style.display = show ? "flex" : "none";
   }
 }
 
@@ -145,14 +145,14 @@ export function toggleCustomDateInputs(show) {
 export function initForm(onSubmit) {
   if (!elements.costForm) return;
   
-  elements.costForm.addEventListener('submit', (e) => {
+  elements.costForm.addEventListener("submit", (e) => {
     e.preventDefault();
     
     const person = elements.person.value.trim();
     const amount = elements.amount.value.trim();
-    const reason = elements.reason ? elements.reason.value.trim() : '';
-    const category = elements.category ? elements.category.value : '';
-    const date = elements.date ? elements.date.value : '';
+    const reason = elements.reason ? elements.reason.value.trim() : "";
+    const category = elements.category ? elements.category.value : "";
+    const date = elements.date ? elements.date.value : "";
 
     onSubmit(person, amount, reason, category, date);
 
@@ -169,9 +169,9 @@ export function initForm(onSubmit) {
 export function initEventDelegation(onDelete) {
   if (!elements.costList) return;
   
-  elements.costList.addEventListener('click', (e) => {
-    if (e.target.classList.contains('delete-btn')) {
-      const index = parseInt(e.target.getAttribute('data-index'));
+  elements.costList.addEventListener("click", (e) => {
+    if (e.target.classList.contains("delete-btn")) {
+      const index = parseInt(e.target.getAttribute("data-index"));
       if (!isNaN(index)) {
         onDelete(index);
       }
@@ -186,8 +186,8 @@ export function initEventDelegation(onDelete) {
 export function initCategoryFilter(onFilter) {
   if (!elements.categoryFilter) return;
   
-  elements.categoryFilter.addEventListener('change', (e) => {
-    onFilter('category', e.target.value);
+  elements.categoryFilter.addEventListener("change", (e) => {
+    onFilter("category", e.target.value);
   });
 }
 
@@ -198,20 +198,20 @@ export function initCategoryFilter(onFilter) {
 export function initDateFilter(onFilter) {
   if (!elements.dateFilter) return;
   
-  elements.dateFilter.addEventListener('change', (e) => {
+  elements.dateFilter.addEventListener("change", (e) => {
     const value = e.target.value;
-    toggleCustomDateInputs(value === 'custom');
+    toggleCustomDateInputs(value === "custom");
     
-    if (value === 'custom') {
+    if (value === "custom") {
       // Use current dates as default
       if (elements.customDateStart) {
-        elements.customDateStart.value = new Date().toISOString().split('T')[0];
+        elements.customDateStart.value = new Date().toISOString().split("T")[0];
       }
       if (elements.customDateEnd) {
-        elements.customDateEnd.value = new Date().toISOString().split('T')[0];
+        elements.customDateEnd.value = new Date().toISOString().split("T")[0];
       }
     } else {
-      onFilter('date', value, '', '');
+      onFilter("date", value, "", "");
     }
   });
 }
@@ -223,10 +223,10 @@ export function initDateFilter(onFilter) {
 export function initCustomDateApply(onFilter) {
   if (!elements.applyCustomDate) return;
   
-  elements.applyCustomDate.addEventListener('click', () => {
-    const startDate = elements.customDateStart ? elements.customDateStart.value : '';
-    const endDate = elements.customDateEnd ? elements.customDateEnd.value : '';
-    onFilter('date', 'custom', startDate, endDate);
+  elements.applyCustomDate.addEventListener("click", () => {
+    const startDate = elements.customDateStart ? elements.customDateStart.value : "";
+    const endDate = elements.customDateEnd ? elements.customDateEnd.value : "";
+    onFilter("date", "custom", startDate, endDate);
   });
 }
 

@@ -2,9 +2,10 @@
  * Firebase initialization and database functions
  */
 
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { getDatabase, ref, push, set, onValue, remove, off } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
-import { firebaseConfig, ENABLE_FIREBASE } from './config.js';
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAnalytics, isSupported as isAnalyticsSupported } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
+import { getDatabase, ref, push, set, onValue, remove, off } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { firebaseConfig, ENABLE_FIREBASE } from "./config.js";
 
 // Firebase-App initialisieren
 let db = null;
@@ -15,18 +16,30 @@ let costsRef = null;
  */
 export function initializeFirebase() {
   if (!ENABLE_FIREBASE) {
-    console.log('Firebase ist deaktiviert. Nutze localStorage als Fallback.');
+    console.log("Firebase ist deaktiviert. Nutze localStorage als Fallback.");
     return false;
   }
   
   try {
     const app = initializeApp(firebaseConfig);
     db = getDatabase(app);
-    costsRef = ref(db, 'costs');
-    console.log('Firebase erfolgreich initialisiert');
+    costsRef = ref(db, "costs");
+
+    // Google Analytics initialisieren (falls unterstützt, z. B. nicht in Node-Tests)
+    isAnalyticsSupported()
+      .then((supported) => {
+        if (supported) {
+          getAnalytics(app);
+        }
+      })
+      .catch((error) => {
+        console.warn("Analytics konnte nicht initialisiert werden:", error);
+      });
+
+    console.log("Firebase erfolgreich initialisiert");
     return true;
   } catch (error) {
-    console.error('Fehler bei Firebase-Initialisierung:', error);
+    console.error("Fehler bei Firebase-Initialisierung:", error);
     return false;
   }
 }
@@ -63,7 +76,7 @@ export async function loadCostsFromFirebase() {
   }
   
   try {
-    const snapshot = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js').then(module => {
+    const snapshot = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js").then(module => {
       return new Promise((resolve) => {
         onValue(costsRef, (snapshot) => resolve(snapshot), { onlyOnce: true });
       });
@@ -77,7 +90,7 @@ export async function loadCostsFromFirebase() {
     });
     return costs;
   } catch (error) {
-    console.error('Fehler beim Laden aus Firebase:', error);
+    console.error("Fehler beim Laden aus Firebase:", error);
     return [];
   }
 }
@@ -89,7 +102,7 @@ export async function loadCostsFromFirebase() {
  */
 export async function saveCostToFirebase(cost) {
   if (!ENABLE_FIREBASE || !db || !costsRef) {
-    return '';
+    return "";
   }
   
   try {
@@ -97,8 +110,8 @@ export async function saveCostToFirebase(cost) {
     await set(newCostRef, cost);
     return newCostRef.key;
   } catch (error) {
-    console.error('Fehler beim Speichern in Firebase:', error);
-    return '';
+    console.error("Fehler beim Speichern in Firebase:", error);
+    return "";
   }
 }
 
@@ -117,7 +130,7 @@ export async function updateCostInFirebase(id, updates) {
     const costRef = ref(db, `costs/${id}`);
     await set(costRef, updates);
   } catch (error) {
-    console.error('Fehler beim Aktualisieren in Firebase:', error);
+    console.error("Fehler beim Aktualisieren in Firebase:", error);
   }
 }
 
@@ -135,7 +148,7 @@ export async function deleteCostFromFirebase(id) {
     const costRef = ref(db, `costs/${id}`);
     await remove(costRef);
   } catch (error) {
-    console.error('Fehler beim Löschen aus Firebase:', error);
+    console.error("Fehler beim Löschen aus Firebase:", error);
   }
 }
 

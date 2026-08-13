@@ -8,7 +8,7 @@
  * @returns {boolean} Is valid
  */
 export function validateAmount(amount) {
-  if (!amount || amount.trim() === '') return false;
+  if (!amount || amount.trim() === "") return false;
   const num = parseFloat(amount);
   return !isNaN(num) && num >= 0;
 }
