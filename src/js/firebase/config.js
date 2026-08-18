@@ -1,16 +1,35 @@
 /**
  * Firebase configuration
- * Ersetze diese Werte mit deiner eigenen Firebase-Konfiguration
  * 
- * Anleitung:
- * 1. Gehe zu https://console.firebase.google.com/
- * 2. Erstelle ein neues Projekt
- * 3. Aktiviere "Realtime Database"
- * 4. Gehe zu Projekt-Einstellungen > Allgemein > Deine Apps > Web-App registrieren
- * 5. Kopiere die Konfiguration hierher
+ * WICHTIG: Bevor Firebase funktioniert, musst du:
+ * 1. Ein Firebase-Projekt erstellen: https://console.firebase.google.com/
+ * 2. Die Realtime Database aktivieren:
+ *    - Gehe zu "Realtime Database" in der Seitenleiste
+ *    - Klicke auf "Datenbank erstellen"
+ *    - Wähle den Modus "Testmodus" (für Entwicklung) oder "Lockere Regeln" (für Produktion)
+ *    - Wähle einen Standort (z. B. "europe-west1")
+ * 
+ * 3. Eine Web-App registrieren:
+ *    - Gehe zu Projekt-Einstellungen (Zahnrad-Icon) > "Deine Apps"
+ *    - Klicke auf "Web-App hinzufügen" (</> Symbol)
+ *    - Gib einen Namen ein (z. B. "Haushaltskosten-App")
+ *    - Registriere die App
+ * 
+ * 4. Kopiere die Firebase-Konfiguration:
+ *    - Nach der Registrierung wird ein Code-Snippet angezeigt
+ *    - Kopiere den Inhalt von `const firebaseConfig = { ... };`
+ *    - Ersetze damit die Platzhalter unten
+ * 
+ * 5. Aktiviere Firebase in dieser App:
+ *    - Setze ENABLE_FIREBASE = true (siehe unten)
+ * 
+ * 6. Starte die App neu und prüfe die Browser-Konsole (F12) auf Fehler
+ * 
+ * Falls du Firebase nicht verwenden möchtest, bleibt ENABLE_FIREBASE = false.
+ * Dann werden die Daten lokal im Browser (localStorage) gespeichert.
  */
 
-// Deine Firebase-Konfiguration (wird später durch deine Werte ersetzt)
+// Deine Firebase-Konfiguration (ERSETZE DIESE PLATZHALTER MIT DEINEN WERTEN!)
 const firebaseConfig = {
   apiKey: "DEIN_API_KEY",
   authDomain: "DEIN_PROJEKT_ID.firebaseapp.com",
@@ -21,7 +40,8 @@ const firebaseConfig = {
   appId: "DEINE_APP_ID"
 };
 
-// Flag, ob Firebase aktiviert ist (für Entwicklung ohne Firebase)
-const ENABLE_FIREBASE = false; // Auf true setzen, wenn Firebase konfiguriert ist
+// Flag, ob Firebase aktiviert ist
+// SETZE DIESEN WERT AUF TRUE, WENN DU FIREBASE VERWENDEN MÖCHTEST!
+const ENABLE_FIREBASE = false;
 
 export { firebaseConfig, ENABLE_FIREBASE };
